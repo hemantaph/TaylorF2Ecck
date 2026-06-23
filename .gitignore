@@ -1,0 +1,34 @@
+# macOS / editor noise
+.DS_Store
+._*
+
+# Python caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Large scientific data / generated analysis artifacts
+*.gwf
+*.hdf
+*.hdf5
+*.dat
+*PSD.txt
+*.npy
+*.npz
+*.pickle
+*.pkl
+partialSNR_dict_*.json
+
+# Bilby / sampler output directories
+outdir*/
+*/outdir*/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz

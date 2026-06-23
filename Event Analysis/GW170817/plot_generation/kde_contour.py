@@ -138,6 +138,9 @@ def kdeplot_2d_clevels(xs, ys, levels=11, rng=None, min_size=500, **kwargs):
         upper bound for ordinate passed to Bounded_2d_kde (optional).
     ax: Axes
         matplotlib axes on which to plot (optional).
+    bw_method: str, float, or callable
+        passed to Bounded_2d_kde / scipy.stats.gaussian_kde.
+        float multiplies Scott's rule (smaller = narrower contours).
     kwargs:
         additional arguments passed to plt.contour().
     """
@@ -159,7 +162,8 @@ def kdeplot_2d_clevels(xs, ys, levels=11, rng=None, min_size=500, **kwargs):
         kwargs['xhigh'] = max(xs)
         kwargs['ylow'] = min(ys)
         kwargs['yhigh'] = max(ys)
-    kde_kws = {k: kwargs.pop(k, None) for k in ['xlow', 'xhigh', 'ylow', 'yhigh']}
+    _kde_keys = ['xlow', 'xhigh', 'ylow', 'yhigh', 'bw_method']
+    kde_kws = {k: kwargs.pop(k) for k in _kde_keys if k in kwargs}
     k = Bounded_2d_kde(np.column_stack((xs, ys)), **kde_kws)
     size = max([10*(len(f)+2), min_size])
     if not isinstance(rng, np.random.Generator):
@@ -168,6 +172,7 @@ def kdeplot_2d_clevels(xs, ys, levels=11, rng=None, min_size=500, **kwargs):
     p = k(np.column_stack((xs[c], ys[c])))
     i = argsort(p)
     l = array([p[i[int(round(ff*len(i)))]] for ff in f])
+    l = np.sort(l)  # matplotlib requires increasing contour levels
 
     Dx = np.percentile(xs, 99) - np.percentile(xs, 1)
     Dy = np.percentile(ys, 99) - np.percentile(ys, 1)

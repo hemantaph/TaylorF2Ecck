@@ -1,0 +1,1459 @@
+\documentclass[aps,prd,twocolumn,superscriptaddress,groupedaddress,nofootinbib,showpacs,eqsecnum,useAms]{revtex4-2}
+
+% \usepackage{caption}
+% \captionsetup{justification=raggedright,singlelinecheck=false}
+% \usepackage{subcaption}
+\renewcommand{\theequation}{\arabic{equation}}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, % set true if you want colored links
+    linkcolor=red,  % color of internal links (change box color with linkbordercolor)
+    citecolor=blue,  % color of links to bibliography
+    filecolor=magenta, % color of file links
+    urlcolor=magenta    % color of external links
+}
+\usepackage{epsfig}
+\usepackage{mathtools}
+\usepackage{verbatim}
+\usepackage{euscript}
+\usepackage{amsthm,dsfont,amsfonts,amsmath,amssymb}
+\usepackage{soul}
+% \usepackage{lineno}
+\usepackage{euscript,color,fontenc,textcomp,relsize}
+\usepackage{bm,url,float,cleveref}
+\usepackage{color,soul}
+\usepackage[caption=false]{subfig}
+\usepackage[utf8]{inputenc}
+%test changes
+% test changes 2
+
+% \usepackage{xcolor}
+% \usepackage[draft,inline,nomargin,index]{fixme}
+% \fxsetup{theme=color,mode=multiuser}
+% \FXRegisterAuthor{gp}{agp}{\color{red}gopu}
+% \FXRegisterAuthor{sh}{ash}{\color{green}hemanta} 
+% \FXRegisterAuthor{tl}{ash}{\color{blue}tjonnie}
+% \FXRegisterAuthor{ma}{ash}{\color{magenta}maria}
+%\usepackage{aastex}
+%\expandafter\ifx\csname package@font\endcsname\relax\else
+ %\expandafter\expandafter
+ %\expandafter\usepackage
+ %\expandafter\expandafter
+ %\expandafter{\csname package@font\endcsname}%
+%\fi
+
+% \bibliographystyle{apsrev4-2}
+
+
+\allowdisplaybreaks
+
+\begin{document}
+
+\preprint{APS/123-QED}
+
+\title{ 
+On constraining initial orbital eccentricity of purely inspiral events
+}
+
+\author{Phurailatpam Hemantakumar,$^{1}$, Achamveedu Gopakumar,$^{2}$, Maria Haney,$^{3}$, Tjonnie Li,$^{4}$, Srishti Tiwari,$^{5}$}
+\affiliation{
+ $^{1}$ Department of Physics, The Chinese University of Hong Kong, Shatin, New Territories, Hong Kong. \\ 
+ $^{2}$ Department of Astronomy and Astrophysics, Tata Institute of Fundamental Research, Mumbai 400005, India. \\
+ $^{3}$ Nikhef - National Institute for Subatomic Physics, Science Park 105, 1098 XG Amsterdam, The Netherlands. \\
+ $^{4}$ Department of Physics and Astronomy, KU Leuven, Celestijnenlaan 200D, B-3001 Leuven, Belgium. \\
+$^{5}$ The Inter-University Centre for Astronomy and Astrophysics, Post Bag 4, Ganeshkhind, Pune 411007, India. }
+\date{\today}
+\begin{abstract}
+
+The LIGO-Virgo-KAGRA consortium has sporadically detected purely inspiral 
+gravitational-wave events like GW170817 and GW190425.
+%, characterized by pure inspiral waveforms. 
+These events offer an opportunity to constrain the presence of possible initial (residual) orbital eccentricities 
+while using purely inspiral template families. 
+%using quasi-circular inspiral templates.
+We detail the implementation of a LSC Algorithm Library Suite approximant, \texttt{TaylorF2Ecck}, which models analytically inspiral gravitational waves from non-spinning compact binaries in Post-Newtonian accurate eccentric orbits while restricting the initial-eccentricity contributions to its leading order.
+Specifically, our frequency domain approximant consistently incorporates the orbital,  advance of periastron, and gravitational-wave emission effects fully up to the 3PN order.
+%, allowing comparison to the existing \texttt{TaylorF2Ecc} model, which is also an eccentric model but without the said effects. 
+We pursue detailed parameter estimation studies of GW170817 and GW190425 using \texttt{TaylorF2Ecck}, after performing comprehensive sanity checks to validate the model’s performance and investigate the influence of  periastron advance in the relevant parameter space.
+%within the mass and $e_0$ parameter space.
+The results indicate that initial-eccentricity at 20 Hz is essentially zero (less than 0.011 for GW170817 and less than 0.028 for GW190425) at a 90\% confidence level. 
+% the following line is added to give more emphasis on the periastron effect, otherwise anybody can say this whole research can be done just by using TaylorF2Ecc and TaylorF2. The extra information here is important, the correlation between k and Mtot is through PN parameter x; this will be influence by higher PN order indeed. 
+% Driven by the PN parameter, the periastron effect and multiple harmonics introduces a subtle yet unmistakable extra correlation and statistical uncertainty between mass and $e_0$ in the posterior distributions of these predominantly circular events, making \texttt{TaylorF2Ecck} diverge from \texttt{TaylorF2Ecc} in regions of higher total mass.
+%The corner plot of the posterior shows that \texttt{TaylorF2Ecck} diverges from the 3PN-restricted non-spinning version of \texttt{TaylorF2Ecc} due to the periastron effect, even at this negligible eccentricity. However, the Bayes-factor comparison shows no waveform preference (i.e. $\Delta \log_{10} \text{BF}<1$).
+We compare posteriors for these two events that arise from a few purely inspiral eccentric approximants and point out certain subtle effects arising due to the inclusion of periastron advance.
+Additionally, these detailed studies reveal the importance of incorporating initial eccentricity contributions at least up to 3.5PN-order and discuss its implications. We substantiate this inference by employing versions of quasi-circular \texttt{TaylorF2} approximant that incorporate Fourier phase contributions beyond the conventional 3.5PN order.
+
+%The LIGO-Virgo-KAGRA consortium has sporadically detected purely inspiral gravitational wave (GW) events like GW170817 and GW190425. These events, extracted using quasi-circular inspiral templates, provide an opportunity to constrain their initial orbital eccentricities. We detail the implementation of a LSC Algorithm Library Suite (LALSuite) approximant, namely \texttt{TaylorF2Ecck}, that models analytically inspiral GWs from non-spinning compact binaries in Post-Newtonian (PN) accurate eccentric orbits while restricting the initial eccentricity contributions to its dominant order. Specifically, our frequency domain approximant consistently incorporates orbital, the advance of periastron GW emission effects to the 3PN order. We pursue detailed parameter estimation studies for pure inspiral GW events using our inspiral approximant after performing comprehensive sanity checks. It turns out that the initial eccentricities for GW170817 and GW190425 are consistent with zero at a 90\% confidence level while employing a uniform prior for $e_0$. Additionally, these detailed studies reveal the importance of incorporating initial eccentricity contributions at least up to 3.5PN-order and list its implications. We substantiate the above inference by employing versions of \texttt{TaylorF2} approximant that incorporates Fourier phase contributions beyond the conventional 3.5PN order.
+
+\end{abstract}
+
+\maketitle
+
+
+%\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\label{sec:level1}Introduction}
+
+% \shnote{Hemanta's color}. \\
+% \gpnote{Gopu's color}.\\
+% \tlnote{Tjonnie's color}. \\
+% \manote{Maria's color}. \\
+
+% The LIGO-Virgo-KAGRA (LVK) consortium is routinely detecting transient GWs from the coalescence of stellar-mass black hole (BH) binaries during their observing runs\cite{}.
+% The detections of around 90 such events have firmly established the era of GW astronomy \cite{}. Additionally, the consortium sporadically detected GWs from a few neutron star-neutron star (NS-NS) and BH-NS binaries \cite{}. In fact, the discovery of inspiral GWs from GW170817 and its electromagnetic counterparts had inaugurated the era of multi-messenger GW astronomy \cite{}. It should be noted that the presently operational GW Observatories can 
+% detect only inspiral GWs from such binary NS systems. Therefore, GWs from scuh 
+% events are detected using the fully analytical frequency domain \texttt{TaylorF2}
+% approximant available in the LALSuite \cite{}.
+% % https://wiki.ligo.org/DASWG/LALSuite. 
+% % Vallisneri et al. 2015% 
+% {\bf a few lines about TF2} \\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Basic introductiion to the field comprehensible to a scientist in any descipline
+% intro to gw detection, and what types of GW can we detect at present?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The LIGO-Virgo-KAGRA (LVK) collaboration has been routinely detecting transient gravitational-wave (GW) events from the coalescence of stellar-mass black hole (BH) binaries during their observing runs~\cite{Abbott_2020, AasiJ2015, Acernese_2014, ptaa125, PhysRevD.88.043007, GraceDBO4}. With the detection of over 100 such events, the era of GW astronomy has been firmly established~\cite{LIGOScientific:2018mvr, Abbott:2020niy, LIGOScientific:2021usb, LVK_O3c}. Additionally, the consortium had sporadically detected GWs from a few neutron star-neutron star (NS-NS or BNS) and neutron star-black hole (NS-BH) binaries~\cite{LVK_GW170817, BHNSs}. The discovery of inspiral GWs from merging NS-NS binary in GW170817, along with its electromagnetic counterparts, marked the advent of multi-messenger GW astronomy \cite{MM170817}. It is important to note that the currently operational GW observatories are primarily sensitive to the inspiral phase of GWs from binary NS systems~\cite{LVK_GW170817}.
+% https://gracedb.ligo.org/superevents/public/O4/
+%https://arxiv.org/abs/2111.03606
+% https://arxiv.org/abs/1710.05832
+%https://iopscience.iop.org/article/10.3847/2041-8213/ac082e
+%https://arxiv.org/abs/1710.05833
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% More detailed background comprehensible to scientists in related disciplines
+% introduction to inspiral events (GW170817)/ PN approximaton/TaylorF2/SPA. More detail and context on taylorf2 becuase it give context to the waveform family of interest. taylorf2 can be extended for spin and eccentricity (introduce eccentricity)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Such inspiral-dominated GW events are typically detected using the fully analytical frequency-domain \texttt{TaylorF2} approximant within the LSC Algorithm Library Suite (LALSuite)~\cite{BIOPS}. 
+%https://arxiv.org/abs/0907.0700
+%The \texttt{TaylorF2} model is a cornerstone in GW data analysis, renowned for its computational efficiency and analytical tractability. This approximant employs the Post-Newtonian (PN) approximation to General Relativity 
+This approximant employs the Post-Newtonian (PN) approximation to General Relativity to model the temporally evolving GW polarization states associated with the inspiral 
+phase of compact binary coalescence~\cite{LB_LR}.
+% https://link.springer.com/article/10.12942/lrr-2014-2
+Note that the PN 
+ approximation requires slow motion and weak fields, and hence 
+ requires $(v/c)^2 \ll 1 $ and $( \mathrm{G} m/r c^2) \ll 1$, 
+where $v$, $m$, and $r$ are 
+the orbital velocity, total mass, and relative separation
+of the binary, respectively.
+The computationally efficient and fully 
+ analytical frequency-domain \texttt{TaylorF2} approximant models 
+ inspiral GWs from compact binaries in quasi-circular orbits.
+ The standard LALSuite implementation typically employs Newtonian (quadrupolar) order 
+ amplitude corrections, while the phase corrections are accurate to 3.5PN order, providing $(v/c)^{7}$ order corrections to the dominant quadrupolar contributions~\cite{BIOPS}.
+ This approximant utilizes the stationary phase approximation (SPA)
+ %, as detailed in Ref.~\cite{DIS01},
+ % https://journals.aps.org/prd/pdf/10.1103/PhysRevD.62.084036
+to obtain analytical frequency-domain inspiral templates from their time-domain 
+ counterparts \cite{DIS01}.
+ It is possible to 
+ extend the approach to incorporate the effects of spin and orbital 
+ eccentricity~\cite{PW95,THG, Moore2019, Boetzel2019, CTGL21, Paul2023, Henry2023, sridhar2024}. 
+ %{ \bf we need more updated references for spins: Done}
+ %  https://arxiv.org/abs/gr-qc/9502040
+ % https://arxiv.org/abs/1602.03081
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Continuation: detailed background; narrower context
+% what the field know
+% Why we are interested on GW170817 (narrower details)
+% What has been establised? Expectations form previous studies (long inspiral, good candidate)?
+% The general problem (big problem in science)/lack of something in our previous knowledge/ context to the problem
+
+% what's the problem ? We want to detect eccentricity
+% Why do we need to tackle this problem? Formation channels and orbital dynamics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Purely inspiral GW events, such as GW170817, spent substantially longer durations in the LVK frequency window (around 20 Hz to kHz) compared to typical BH binary events. For instance, the inspiral phase of GW170817
+%within the LIGO frequency band, the inspiral duration of GW170817 
+spans approximately 168\footnote{Inspiral duration estimated using the \texttt{calculate\_time\_to\_merger} function in \texttt{Bilby} software~\cite{bilby_paper}, from 20 Hz to the last stable orbit frequency $f_{\rm LSO}$ (see Eq.~(\ref{eq:flso}) of Appendix~\ref{sec: TaylorF2Ecck hf}).\label{xx}}~s, while that of 
+the first GW event, GW150914, lasted a mere 0.7\textsuperscript{\ref{xx}}~s. 
+Consequently, purely inspiral LVK events are particularly well-suited for exploring the effects of any residual orbital eccentricity, benefiting from their large number of GW cycles within the operational frequency windows of GW observatories~\cite{Favata2022}.
+In general, typical LVK binaries are expected to exhibit small residual eccentricities, less than $10^{-4}$, although NS binaries may display higher initial eccentricities~\cite{Kowalska11}. 
+% https://arxiv.org/pdf/1010.0511.pdf
+ The small initial eccentricities are expected 
+due to the efficiency of GWs in circularizing isolated eccentric binaries by rapidly radiating away angular momentum~\cite{Peters64}. 
+% https://ui.adsabs.harvard.edu/abs/1964PhRv..136.1224P/abstract
+Astrophysical considerations suggest that the detection of residual eccentricities in LVK events is crucial for distinguishing between the two possible astrophysical formation channels for stellar-mass compact binaries~\cite{Zevin2021}.
+% arXiv:2106.09042 [astro-ph.HE].
+ In the isolated formation channel, compact binaries originate
+from the evolution of massive binary stars without external perturbation~\cite{Broekgaarden2021}, and astrophysical assessments indicate that their orbits should be circularized by the time their GWs enter the 
+LVK frequency window~\cite{Belczynski16}.
+%  https://www.nature.com/articles/nature18322
+In contrast, compact binaries can evolve dynamically when BHs or NSs form binaries with other BHs or NSs in dense stellar environments~\cite{Sigurdsson1993}.
+% 
+Such systems include nuclear star clusters, globular clusters, young star clusters, or even the discs of Active Galactic Nuclei (for a detailed review, see Refs.~\cite{Sigurdsson1993,Miller2002,Rodriguez2016b,Antonini2016a, Antonini2016b,Askar2017, Haiman2009, Bartos2017}).
+It is argued that the presence of measurable initial orbital eccentricity should aid in distinguishing between these scenarios~\cite{Antonini2014, Rodriguez2016a, Wen2003, Antognini2014,Gultekin2004, OLeary2006, Haster2016, DOrazio2018, Fragione2019, Zevin2021, Breivik2016}.
+This understanding was the primary motivation behind early attempts to constrain the initial eccentricity of GW150914, as discussed in Ref.~\cite{GW150914_prop}. Significant work has gone into creating gravitational waveform models that incorporate the effects of orbital eccentricity\cite{Morras2025a, planas2025b, RomeroShaw2019, Nitz2020,Romero_Shaw_2020_GW190521, gayathri2022, Wu2020, Favata2022, OShea2023, RomeroShaw2021, Gamba2022, Bonino2023, iglesias2023, Klein2010, Klein_2018, Klein2021}. Such models have been applied to analyze GW signals observed by LIGO and Virgo, and they have also been used in recent studies to set bounds on initial eccentricities of a few LVK coalescence events\cite{BBG23, Morras2025b, planas2025a}.
+%This understanding was the primary motivation for attempting to constrain the initial eccentricity of GW150914, as discussed in Ref.~\cite{GW150914_prop}.
+% https://arxiv.org/abs/1602.03840
+%Additionally, there exists recent efforts to bound initial eccentricities of a few LVK coalescence events \cite{BBG23}.
+% https://arxiv.org/abs/2309.15528$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Remaining gap (waveform not good enough) (narrow problem )
+% How other people have tried to address this problem
+% what the field knows from this(from one specific or a couple)
+
+% Why the problem is persist? no good waveform 
+% How do you address the problem? extending the extending the TaylorF2Ecc to include periastron effect
+% why your work is important/why do people need that? periastron effect is an important GR related that influence the orbital dynamics; this will increase the accuracy of the waveform and will help better constrant the parameter estimation parameters
+% Extra questions:
+% How it is diffrent from existing TaylorF2: formula, behaviour in waveform morphology and in the result of various test
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Interestingly, firm bounds on initial-eccentricity $e_0$ of two pure inspiral LVK events, namely GW170817 and GW190425, were established in Ref.~\cite{LNB}.
+%https://arxiv.org/pdf/2005.14146.pdf
+This analysis utilized the \texttt{TaylorF2ecc} approximant, which incorporates leading-order initial eccentricity contributions that are 3PN-accurate in the Fourier phase of the widely used 
+circular \texttt{TaylorF2} inspiral approximant~\cite{MF16}.
+% https://arxiv.org/abs/1605.00304 
+The \texttt{TaylorF2ecc} approximant, as detailed in Ref.~\cite{Favata2022,MF16}, also includes 3.5PN-order circular inspiral contributions to the dominant Fourier phase component and features quadrupolar and circular amplitudes. However, it does not account for the effects of periastron advance which enter the compact binary dynamics at the 
+1PN order \cite{DD85}. 
+% https://www.ihes.fr/~damour/Conferences/DamourDeruelleAIHP85.pdf
+This effect refers to the gradual rotation of the closest point (periastron) of an eccentric orbit involving compact objects due to general relativistic gravitational effects.
+%{\bf Periastron advance, a significant General Relativistic effect, describes the slow rotation or advancement of the point of closest approach (periastron) in each elliptical orbit, a phenomenon that becomes more pronounced in strong gravitational fields. Plese don't use ChatGPT lines without citations}
+%Furthermore, \texttt{TaylorF2ecc} neglects the coupling between spin and eccentricity contributions and should therefore be used with caution for eccentric-spinning binaries. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% our approch: how it will help or is diffrent or have improve
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Our current work introduces a new LALSuite-compatible approximant, \texttt{TaylorF2ecck}, which utilizes and adapts inputs from Ref.~\cite{TGHH}. Consequently, our effort provides fully analytic Fourier-domain inspiral templates for eccentric inspirals, incorporating ${\cal O}(e_0^2)$ contributions arising from 3PN-accurate periastron advance and GW emission in the relevant Fourier phases, while their amplitudes are at the quadrupolar order, accurate to ${\cal O}(e_0)$ order.
+In other words, our inspiral approximant extends the \texttt{TaylorF2} inspiral approximant for non-spinning compact binaries by consistently including all leading-order $e_0$ contributions that arise from orbital, periastron advance, and GW emission effects—with these contributions included in the phase up to 3PN order and in the amplitude at the 0PN order.
+% In other words, our inspiral approximant consistently includes all ${\cal O}(e_0^2)$ contributions that arise from orbital, periastron advance, and GW emission effects up to 3PN order into the \texttt{TaylorF2} inspiral approximant for {\bf non-spinning compact binaries}. 
+% In other words, our inspiral approximant consistently includes all leading-order $e_0$ contributions that arise from orbital, periastron advance, and GW emission effects into the \texttt{TaylorF2} inspiral approximant for non-spinning compact binaries, with contributions included up to 3PN order in the phase and 0PN order in the amplitude.
+Therefore, our \texttt{TaylorF2ecck} approximant provides an accurate and computationally efficient and accurate template family for analyzing non-spining low-eccentricity inspiral events.
+We note in passing that this is a 
+%It is important to note that \texttt{TaylorF2ecck} is a 
+restricted version of the approximant presented in Ref.~\cite{TGHH}, which provides eccentric corrections accurate to ${\cal O}(e_0^6)$ with amplitude corrections at 1PN order. 
+%By restricting eccentricity contributions to ${\cal O}(e_0^2)$ and enhancing the accuracy of the eccentric waveform model with periastron advance effects, \texttt{TaylorF2ecck} provides a computationally efficient and accurate template for analyzing non-spining low-eccentricity inspiral events.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Our approch: continuation.
+
+% Summary: 
+% | Feature   | Introduction Summary   |
+% | --------- | ---------------------- |
+% | Purpose   | Preview & Context      |
+% | Focus     | Novelty & Significance |
+% | Scope     | Main Results           |
+% | Tone      | Persuasive             |
+
+% Extra questions:
+% Does it help with the test and what result
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this paper, we employ our \texttt{TaylorF2ecck} approximant to constrain $e_0$ of two pure inspiral GW events, GW170817 and GW190425. By applying Bayesian inference techniques and nested sampling algorithms~\cite{Skilling2004}, we estimate $e_0$ for these events, yielding results consistent with near-zero eccentricity around a GW frequency of $20$ Hz.
+at a high confidence level. 
+Interestingly, our analysis shows no significant difference in the results between uniform and logarithmic priors though Ref.~\cite{LNB} had 
+ pointed out a dependence on the choice of prior for constraining $e_0$ while 
+employing another eccentric inspiral  \texttt{TaylorF2ecc} approximant.
+%{\bf A line about this approximant....}
+Our study reveals the subtle influences of the periastron effect, particularly in the higher mass region of the parameter space as this conservative PN effect mainly depends on the total mass.
+%an effect driven by the Post-Newtonian (PN) parameter.
+Additionally, these detailed studies strongly suggest 
+the importance of incorporating initial eccentricity contributions at least up to the 3.5PN-order, influenced 
+by the nature of posteriors for the mass ratio for the pure inspiral GW events.
+We  substantiate this inference by employing versions of the quasi-circular 
+\texttt{TaylorF2} approximant that incorporate Fourier phase contributions beyond the conventional 3.5PN order. 
+%We infer that including these higher-order terms will improve parameter estimation, enabling more accurate constraints on mass and $e_0$. 
+%{This refinement will enhance eccentric waveform models, and obtaining a TaylorF2ecck approximant with Fourier coefficients accurate to 3.5PN order will be important for effective data analysis and developing eccentric IMR templates for LVK eccentric GW searches.
+%} {\bf Can you justify lines like   `more accurate constraints on mass and $e_0$' }{\it Now I understand it's somewhat misleading. I wanted to say that, TaylorF2 3.5 is already tested waveform, and TaylorF2Ecck 3PN gives biased parameter estimation costrain on q . But $q$-$e_0$ are correlated \{Favata2022\}, also seen in our GW170817 parameter estimation with TaylorF2Ecck. Biased in mass means biased in $e_0$. I am removing the line, unless I come up with with strong justification.}
+% In this paper, we employ the \texttt{TaylorF2ecck} approximant to
+% measure $e_0$ of two pure inspiral events, GW170817 and GW190425, using Bayesian inference techniques and nested sampling algorithms~\cite{Skilling2004}.
+% % when we begin the templates at a GW frequency of $20$ Hz.
+% We find that  the $e_0$ values for  GW170817 and 
+% GW190425 be zero at 90\% confidence while employing uniform prior for $e_0$.
+% Interestingly, our analysis shows no significant difference in the results between uniform and logarithmic priors though Ref.~\cite{LNB} had 
+% pointed out a dependence on the choice of prior for constraining $e_0$ while 
+% employing the \texttt{TaylorF2ecc} approximant.
+% %Furthermore, we compare our results with what are available in the literature 
+% %that employed different inpsiral approximants 
+% %\cite{}.
+% % { \bf a line about prior dependence }
+% %%%%%%%%%hemanta%%%%%%%
+% %While previous results have pointed out a dependence on the choice of prior for constraining $e_0$, our analysis shows no significant difference in the results between uniform and logarithmic priors.
+% %%%%%%%%%%%%%%%%%%%%%%%
+% Interestingly, our approximant provides 
+% a narrower posterior for the mass ratio, compared to Refs.~\cite{LVK_GW170817, LNB}
+% % compared to what is listed in Refs.~\cite{}.
+% We attribute it to 
+% %this should be due to 
+% the use of only 3PN accurate Fourier phases in our approximant 
+% and it should be noted that
+% this is the maximum PN order that we can go while incorporating 
+% $e_0$ contributions in a consistent manner \cite{Arun09}.
+% To substantiate the above point, we pursue 
+% parameter estimation (parameter estimation) studies while 
+% employing circular
+% \texttt{TaylorF2} templates where the Fourier phase contributions are accurate from 3PN to 4.5PN order, influenced by Ref.~\cite{B45PN_23}.
+% % https://arxiv.org/abs/2304.11185
+% These investigations suggest that one should 
+% include Fourier phase contributions that are 
+% accurate to 3.5PN order while incorporating 
+% eccentricity corrections.
+% This requires detailed calculations to obtain 
+% 3.5PN accurate (at least) energy and angular momentum fluxes from compact binaries in eccentric orbits and their associated Fourier phases, extending 3PN efforts detailed in 
+% Refs.~\cite{Arun09}.
+% %https://arxiv.org/abs/0908.3854
+
+%Given these advancements, there emerges a compelling necessity to develop and implement PN-accurate and computationally efficient waveform families that aptly model inspiral gravitational waves from compact binaries in eccentric orbits. A robustly developed eccentric model not only surmounts challenges in capturing the dynamics of such systems accurately but also enhances the measurement of gravitational wave parameters by alleviating the degeneracy between them. These degeneracies, arising from correlations among parameters such as chirp mass, mass ratio, luminosity distance, inclination angle, and source localization, can be significantly reduced with the inclusion of eccentricity in waveform models. Consequently, our endeavor represents an ongoing effort to construct comprehensive analytic waveform models that integrate eccentricity. This integration not only refines the fidelity of gravitational wave data analysis but also contributes profoundly to our understanding of the intricate dynamics governing these cosmic phenomena.
+
+%This manuscript is organized as follows:
+This manuscript is structured as follows: Sec.~\ref{sec:Model} provides an overview of the various frequency-domain waveforms employed in our investigations. In this section, the TaylorF2ecck approximant is introduced, and waveform sanity checks are performed. Sec.~\ref{sec:data_analysis} details the data analysis techniques and presents parameter estimation results for GW170817 and GW190425. Our efforts to constrain the $e_0$ value for these events, along with its implications and limitations, are described within this section. Appendices~\ref{sec: TaylorF2Ecck_full} and~\ref{sec: TaylorF2Ecch_full} offer the explicit PN-accurate expressions relevant to our inspiral approximants.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\label{sec:Model} 
+Inspiral Waveform Approximants
+} 
+In this section, we briefly introduce various fully analytic inspiral approximants employed in our investigations. These include existing approximants available in the LALSimulation library, such as \texttt{TaylorF2} and \texttt{TaylorF2ecc}, which are detailed in Refs.~\cite{BIOPS, MF16}, and  two new eccentric inspiral approximants: \texttt{TaylorF2ecck} and \texttt{TaylorF2ecch} influenced by~\cite{TGHH, THG, Yunes2009}.  We first describe these approximants, followed by presenting detailed sanity checks for them.
+%The analytical form of TaylorF2ecck and TaylorF2ecch, along with their implications, are discussed, followed by waveform sanity checks.
+
+\subsection{ Eccentric Inspiral Approximants }\label{sec: TaylorF2Ecck intro}
+ 
+We begin by listing our \texttt{TaylorF2ecck} approximant that employs 
+expressions from Ref.~\cite{TGHH}. This fully analytic Fourier domain approximant models inspiral GWs from non-spinning compact point mass binaries in preccessing PN-accurate eccentric orbits. 
+% While Ref.~\cite{TGHH} details expressions with 1PN-accurate amplitude corrections (including eccentricity effects up to ${\cal O}(e_0^6)$ at each PN order) and 3PN-accurate GW phase evolution (also incorporating eccentricity effects up to ${\cal O}(e_0^6)$ at each PN order), the version employed in this study is more restricted, primarily to reduce computation cost in parameter estimation.
+While Ref.~\cite{TGHH} offers expressions with 1PN-accurate amplitude corrections and 3PN-accurate phase evolution, both incorporating eccentricity effects up to ${\cal O}(e_0^6)$ at each PN order, our implementation for this work adopts a restricted version, primarily to reduce computation cost in parameter estimation.
+Specially,
+for the present effort, we restrict our attention to a version that incorporates the quadrupolar order amplitudes,
+%, with leading-order $e_0$ ${\cal O}(e_0)$ corrected
+%  Sashwat et al. 2016 . In this approach, one first computes eccentricity induced higher ω-based harmonic corrections to both the amplitudes and phases of the two GW polarization states.
+% TaylorF2Ecck (Favata et al 2022): ignoring eccentricity corrections to the amplitude, which is effectively that of a circular binary and contain
+%, with leading order $e_0$ ${\cal O}(e_0)$, 
+%contributions, 
+while the relevant  Fourier phases are fully 3PN-accurate
+to the leading order ${\cal O}(e_0^2)$ contributions,
+% and incorporate $\mathcal{O}(e_0^2)$ corrections, 
+% and the Fourier amplitude includes ${\cal O}(e_0)$ contributions.
+and ${\cal O}(e_0)$ contributions in the Fourier amplitude.
+ Our \texttt{TaylorF2ecck} approximant adapted from Eq.~(2.5) of Ref.~\cite{TGHH} reads
+
+\begin{subequations}
+\begin{align}
+\tilde{h}(f) = & \, {\cal \tilde{A}} \left(\frac{Gm\pi f}{c^3}\right)^{-7/6} \notag \\ 
+& \times \sum_{j,n} \xi_{j,n} \left(\frac{j}{2}\right)^{2/3} e^{-i(\Psi_{j,n}-\pi/4)} \; \Theta_{j,n}\,,
+\end{align}
+with
+\begin{align}
+{\cal \tilde{A}} = &  \, -\left( \frac{5\pi \eta}{384} \right)^{1/2} \frac{(G m)^2}{c^5 D_L}\,,
+\end{align}
+\end{subequations}
+
+where $(j, n)$ harmonic combinations take values (1,0), (1,-2), (2,-2) and (3,-2) for the current version of the \texttt{TaylorF2ecck} approximant. The (2,-2) harmonic is the dominant one while the rest are sub-dominant, with their amplitudes suppressed at low $e_0$ values (see Eq.~(\ref{eq:xiEcck_simple})). Following Ref.~\cite{TGHH}, we  term $\tilde{A}$ and $\xi_{j,n}$ as harmonic independent and harmonic dependent amplitudes of our approximant, respectively. Clearly, $\tilde{A}$ depends on the total mass ($m=m_1+m_2$), the symmetric-mass-ratio ($\eta=\frac{m1\,m2}{m^2} = \frac{q}{(1+q)^2}$), where 
+$m_1, m_2$ and $q$ are the individual masses and their ratio and $D_L$ stands for the luminosity-distance. Note that it is possible to express the $m$ and $\eta$ dependence of 
+$\tilde{A}$
+into the more familiar chirp-mass ${\cal M}$ dependence~\cite{findchirp}. In the above equation,
+$\Theta_{j,n}$ is the Unit-Step function, which allows us to appropriately terminate each harmonic at the correct physically allowed frequency limit (see Eq.~(3.26) of Ref.~\cite{TGHH}).
+Furthermore, $\xi_{j,n}$ depends on $e_0$, orbital inclination $\iota$, and azimuthal angles $\beta$, along with the antenna pattern functions $F_+$, $F_{\times}$, and $\eta$ (we let $\beta=0$, influenced by the \texttt{LALSimulation} considerations). In what follows, we list the expressions for $\xi_{j,n}$ that are accurate to $\mathcal{O}(e_0)$ order, influenced by Eq.~(3.16) in Ref.~\cite{TGHH}, and it reads 
+\begin{align}
+\xi_{1,0} &= F_+\left\{-\frac{\sin^2 \iota}{\chi^{19/18}} e_0\right\}\,, \notag \\ 
+\xi_{1,-2} &= F_+\left\{-\frac{3(3+\cos(2\iota))}{4\chi^{19/18}} e_0 \right\} + i F_\times \left\{-\frac{\cos\iota}{\chi^{19/18}} e_0 \right\}\,, \notag \\ 
+\xi_{2,-2} &= F_+\left\{3 + \cos(2\iota)\right\} + i F_\times \left\{4 \cos\iota\right\}\,, \notag \\ 
+\xi_{3,-2} &= F_+\left\{\frac{9(3+\cos(2\iota))}{4\chi^{19/18}} e_0 \right\} + i F_\times \left\{\frac{9 \cos\iota}{\chi^{19/18}} e_0 \right\}\,, \label{eq:xiEcck_simple}
+\end{align}
+% \begin{subequations}
+% \begin{align}
+% \xi_{1,0} =&\, F_+\left(-\frac{\sin(\iota)^2}{\chi^{19/18}} \, e_0\right) + i F_\times (0.0)\,, \\
+% \xi_{1,-2} =&\, F_+\left(-\frac{3(3+\cos(2\iota))}{4\chi^{19/18}} \, e_0 \right) \notag \\ + &\, i F_\times\left(-\frac{\cos(\iota)}{\chi^{19/18}} \, e_0 \right)\,, \\
+% \xi_{2,-2} =&\, F_+\left(3 + \cos(2\iota)\right) + i F_\times\left(4\,\cos(\iota)\right)\,, \\
+% \xi_{3,-2} =&\, F_+\left(\frac{9(3+\cos(2\iota))}{4\chi^{19/18}}\,e_0 \right)\notag \\ +&\, i F_\times\left(\frac{9\,\cos(\iota)}{\chi^{19/18}}\,e_0 \right)\,.
+% \end{align} \label{eq:xiEcck_simple}
+% \end{subequations}
+where the dimensionless $\chi $ is given by $ \chi = f/f_0$ (with $f_0$ being the the initial GW frequency). Note that the dominant (2,-2) mode lack $e_0$ correction and circular in nature. 
+%In our analysis, we incorporate $\mathcal{O}(e_0^2 )$ corrections to these amplitudes.
+
+In what follows, we list fully analytic 1PN-accurate Fourier phases, namely ($j, n$) harmonics,  that include all the $\mathcal{O}(e_0^2)$ corrections for visualization purposes. This form for the ($j, n$) harmonic reads
+%While the full analytical form of \texttt{TaylorF2ecck} approximant's Fourier phase is listed in Appendix~\ref{sec: TaylorF2Ecck psi}, for visualization, the 1PN $\mathcal{O}(e_0^2)$-accurate form for the ($j, n$) harmonic is given here, and it reads 
+\begin{subequations}
+\label{eq:psi_ecck}
+\begin{widetext}
+\begin{align}
+\Psi_{j,n}= & \, -2 \pi  f t_c+ \phi_c \left(j- (j+n)\frac{k}{1+k}\right)-\frac{3 j}{256 \eta  x_{j,n}^{5/2}}\Biggl[ 1-\frac{2355 e_0^2}{1462 \chi ^{19/9}}+x_{j,n} \Biggl\{ \frac{55 \eta }{9}-\frac{25 n}{3 j}-\frac{2585}{756} \notag \\ & + e_0^2 \left( \frac{\frac{154645 \eta }{17544}-\frac{2223905}{491232}}{\chi ^{25/9}}+\frac{-\frac{128365 \eta }{12432}+\frac{1805 n}{172 j}+\frac{69114725}{14968128}}{\chi ^{19/9}} \right) \Biggl\} + \ldots\Biggr]\,, \label{eq:psi_simple}
+\end{align}\label{eq:x_jn}
+\end{widetext}
+with
+\begin{align}
+x_{j,n} =&\, \left[\frac{2 \pi G m f}{\left\{j - (j+n)\frac{k}{1+k}\right\}c^3}\right]^{2/3}\,, 
+\end{align}\label{eq:x_jn}
+\end{subequations}
+and we refer to Eq.~(\ref{eq:Ecck_psi_full}) of Appendix~\ref{sec: TaylorF2Ecck_full} for its 3PN-accurate version.
+%In the equation 2.7,  
+In the above equation, $t_c$ and $\phi_c$ are the time and phase of coalescence, respectively, while $k$ is the rate of periastron advance and $x_{j,n}$ is the harmonic-dependent dimensionless PN parameter.
+% The dimensionless $\chi $ is given by $ \chi = f/f_0$ (where $f_0$ being the the initial GW frequency) while 
+% $x_{j,n}$ is the harmonic-dependent dimensionless PN parameter. 
+We would like to emphasize that our {\it restricted} \texttt{TaylorF2ecck} approximant contains {\it four} harmonics, while their Fourier phases are fully 3PN-accurate 
+and incorporate $\mathcal{O}(e_0^2)$ corrections.
+%the leading order  $e_0$ corrections.
+For the present effort, 
+we employ the 3PN-accurate version of $k$ in our approximant, given in Eq.~(\ref{eq:k_full}) of Appendix~\ref{sec: TaylorF2Ecck_full}. 
+
+% {\bf Following lines need total re-write.....
+% However, it is easier to observe how sub-dominant harmonic of $\psi_{j,n}$ changes with $k^{(2)}_{(1)}$ rather than with $k$ (where the subscript and superscript represent the 1PN-$\mathcal{O}(e_0^2)$ order, and the 3PN representation is $k^{(2)}_{(3)}$).}
+% To show the structure and $(m, \eta,e_0) $ dependence of PN-accurate $k$ 
+% we list below 
+% In what follows, we list expression of $k^{(2)}_{(1)}$, and it reads
+% %, the version of $k$ with 2PN acc $ \mathcal{O}(e_0^2)$ corrections
+% %It's good to show till 2PN term, i.e. $k^{(2)}_{(2)}$, to include the $\eta$ dependence, and thus bi-variate expansion, at small $e_0$ and $x$, of $k^{(2)}_{(2)}$ reads
+% \begin{subequations}
+% \label{eq:k_simple} 
+% \begin{align}
+% % k^{(2)}_{(2)}_j =& \, x_j \Biggl[ 3 + e_0^2 \left( \frac{3}{\chi^{19/9}} \right) \Biggr] \notag \\
+% % +&\, x_j^2_j \Biggl[ \frac{27}{2} - 7\eta + e_0^2 \Bigg\{ \left(\frac{2833}{336} - \frac{197\eta}{12}\right)\frac{1}{\chi^{25/9}} \notag \\
+% % +&\, \left(\frac{10523}{336} - \frac{49\eta}{12}\right)\frac{1}{\chi^{19/9}} \Bigg\} \Biggl] + \ldots \,, \label{eq:k_simple_} 
+% k^{(2)}_{(2),j} =& \, x_j \left[3 + e_0^2 \frac{3}{\chi^{19/9}}\right] \notag  \\
+% &+\, x_j^2 \left[ \frac{9}{2} - 7\eta + e_0^2 \left(\frac{4475}{336}-\frac{49 \eta }{12}\right) \frac{1}{\chi^{19/9}} \right. \notag \\
+% &+\left.\, \left(\frac{2833}{336}-\frac{197 \eta}{12}\right) \frac{1}{\chi^{25/9}} \right] + \ldots \,, \label{eq:k_simple_} 
+% \end{align}
+% with
+% \begin{align}
+% x_{j} =& \, \left(\frac{2 \pi G m f}{j c^3}\right)^{2/3}\,. \label{eq:x_j}
+% \end{align}
+% \end{subequations}
+%%%%%%%%%%%%%%%%%%%%%
+% TaylorF2Ecch.
+% what is this waveform and how it is different
+%%%%%%%%%%%%%%%%%%%%%
+%For comparison purposes,
+To isolate the effects of $k$,
+we now introduce another eccentric approximant, namely \texttt{TaylorF2ecch}, influenced by 
+Refs.~\cite{THG,Yunes2009}. 
+Therefore, this approximant omits the effects of periastron advance both on Fourier amplitudes and 
+phases though Fourier phases are 3PN-accurate while incorporating $\mathcal{O}(e_0^2)$ corrections.
+The neglect of periastron advance effects on amplitudes ensures that the 
+%While it matches its counterpart, TaylorF2ecck, in the PN order accuracy of the Fourier phase (3PN order) and inclusion of leading-order eccentricity in both the Fourier phase and quadrupolar-order amplitude, it notably omits periastron advance effects. This omission simplifies the harmonic structure of TaylorF2ecch, as it doesn't exhibit the sidebands caused by periastron precession~\cite{Yunes2009}. Consequently, 
+\texttt{TaylorF2ecch} 
+is expressed as a sum over single harmonics $j$, whereas TaylorF2ecck includes splitting (as seen in the splitting of $j=1$ to $(j,n)=(1,0),(1,-2)$, as evident from  Eq.~(\ref{eq:xiEcck_simple})). 
+In other words,
+this approximant has a reduced harmonic content with modes limited to $j=1,2,3$ and lacks the additional phase shift associated with periastron effects found in the sub-dominant harmonics of TaylorF2ecck (see the second term in Eq.~(\ref{eq:psi_simple})
+for $\psi_{j,n}$).
+Therefore, this approximant should help us delineate scenarios where  periastron effects are significant 
+in comparison with our \texttt{TaylorF2ecck} templates, as discussed in Sec.~\ref{sec:sanity_check}). 
+%which might affect its precision in capturing gravitational waveforms in scenarios where periastron effects are significant (it will be discussed further in Sec.~\ref{sec:sanity_check}). 
+Our \texttt{TaylorF2ecch} approximant, influenced by Ref.~\cite{THG}, reads
+\begin{align}
+\tilde{h}(f) = & \, {\cal \tilde{A}} \left(\frac{Gm\pi f}{c^3}\right)^{-7/6}\notag \\ 
+& \times \sum_{j} \xi_{j} \left(\frac{j}{2}\right)^{2/3} e^{-i(\Psi_{j}-\pi/4)}\; \Theta_{j}\,,
+\end{align}
+while its Fourier amplitudes  have the following structure 
+\begin{align}
+\xi_{1} =&\, F_+\left\{-\frac{3(3+\cos(2\iota))}{4\chi^{19/18}}e_0 - \frac{\sin(\iota)^2}{\chi^{19/18}}e_0\right\} \notag \\
+&+ i F_\times\left\{-\frac{\cos(\iota)}{\chi^{19/18}}e_0 \right\}\,, \notag\\ 
+\xi_{2} =&\, F_+\left\{3 + \cos(2\iota)\right\} + i F_\times\left\{4\,\cos(\iota)\right\}\,, \notag \\ 
+\xi_{3} =&\, F_+\left\{ \frac{9(3+\cos(2\iota))}{4\chi^{19/18}}e_0 \right\} + i F_\times \left\{\frac{9\,\cos(\iota)}{\chi^{19/18}}e_0 \right\}\,. \label{eq:xiEcch_simple}
+\end{align}
+The 3PN-accurate expression of $\Psi_{j}$ is included in Appendix~\ref{sec: TaylorF2Ecch_full} (see Eq.~(\ref{eq:Ecch_psi_full})). For the sake of comparison with Eq.~(\ref{eq:psi_ecck}),
+%We again write only 
+the 1PN-accurate version of Fourier phases is given by
+\begin{align}
+\Psi_{j}= & \, -2 \pi  f t_c+ \phi_c j -\frac{3 j}{256 \eta  x^{5/2}}\Biggl[ 1+\frac{2355 e_0^2}{1462 \chi ^{19/9}} \notag \\
+&+x_j \Biggl\{\frac{55 \eta }{9}+\frac{3715}{756} + \text{et0}^2 \biggr(\frac{-\frac{128365 \eta }{12432}-\frac{2045665}{348096}}{\chi ^{19/9}}\notag \\
+&+\frac{\frac{154645 \eta }{17544}-\frac{2223905}{491232}}{\chi ^{25/9}}\biggr) \Biggl\} + \ldots\Biggr] \,. \label{eq:psi1PNEcch}
+\end{align}
+\begingroup
+\renewcommand{\arraystretch}{1.5} % Default value: 1
+\begin{center}
+\begin{table}[ht!]
+\begin{tabular}{lp{2.2cm}p{1.6cm}p{1.9cm}}
+\hline\hline
+Model & Fourier Phase \newline accuracy & Amplitude \newline correction & Harmonics \newline ($j, n$) \\
+\hline
+\texttt{TaylorF2ecck} & 3PN-$\mathcal{O}(e_0^2)$ & $\mathcal{O}(e_0)$ & (1, 0), (1, -2), (2, -2), (3, -2) \\
+\texttt{TaylorF2ecch} & 3PN-$\mathcal{O}(e_0^2)$ & $\mathcal{O}(e_0)$ & (1, -2), (2, 2), (3, -2) \\
+\texttt{TaylorF2ecc} & 3PN-$\mathcal{O}(e_0^2)$ & None & (2, -2) \\
+\texttt{TaylorF2} & 3, 3.5, 4, 4.5PN & None & (2, -2) \\
+\hline\hline
+\end{tabular}
+\caption{This table compares inspiral approximants used in the current study. All approximants consider non-spinning compact binaries with amplitudes at quadrupolar order. 
+\texttt{TaylorF2ecck} features 3PN-$\mathcal{O}(e_0^2)$ accurate Fourier Phases, multiple harmonics beyond the (2,-2) mode, quadrupolar amplitude with $\mathcal{O}(e_0)$ corrections, all effects of periastron advance.
+%effects, sub-dominant harmonic phase shifts, and sideband splitting.
+\texttt{TaylorF2ecch} is similar to \texttt{TaylorF2ecck} in phasing and amplitude accuracy (PN and $e_0$ order) but omits all periastron advance related effects. \texttt{TaylorF2ecc} has 3PN-$\mathcal{O}(e_0^2)$ accurate Fourier phase corrections but is restricted to the dominant harmonic with quadrupolar, circular amplitude, while neglecting  periastron effects \cite{Favata2022}. Our quasi-circular \texttt{TaylorF2} template family 
+allows us to invoke it with its Fourier phase accurate to 
+different PN orders.
+%of the Fourier phase, allowing tests of PN order related systematics.
+}
+\label{table:approximants}
+\end{table}
+\end{center}
+\endgroup
+We now describe a version of the \texttt{TaylorF2ecc} approximant, detailed in Sec.~IV of Ref.~\cite{MF16} and mentioned in Sec.~II of Ref.~\cite{Favata2022}, that we employed in our present effort. This approximant essentially extends the \texttt{TaylorF2} approximant by incorporating leading-order $e_0$ corrections to its PN-accurate Fourier phase. This implies that the amplitude of this approximant is circular and accurate to the Newtonian (quadrupolar) order. Consequently, its harmonic content is restricted to the dominant (2,-2) mode~\cite{Favata2022}. As detailed in Ref.~\cite{MF16}, \texttt{TaylorF2ecc} also includes 3.5PN-order circular contributions to its Fourier phase. 
+To make 
+meaningful comparisons in our analysis, we typically ignore circular non-spinning 3.5PN terms and PN-accurate (circular) spin contributions that appear in the Fourier phase expression of the \texttt{TaylorF2ecc} approximant, unless stated otherwise. 
+Let us emphasize that 
+\texttt{TaylorF2ecc} does not account for the effects of periastron advance both in its Fourier amplitudes and phases as evident from Eq. (6.26) of Ref.~\cite{MF16}.
+%, and consequently lacks the Harmonic structure and pariastron phase shift found in \texttt{TaylorF2ecck}. 
+% The \texttt{TaylorF2ecc} analytic expression is given by Eq. (6.26) of Ref.~\cite{MF16}.
+
+Finally, let us briefly discuss various versions of the quasi-circular  \texttt{TaylorF2} approximant, detailed in Ref.~\cite{BIOPS}, that we employed in the present effort. Recall that this approximant works for purely circular inspirals and employs a 3.5PN accurate Fourier phase expression, given by Eq. (3.18) in Ref.~\cite{BIOPS}. The standard LALSuite implementation of \texttt{TaylorF2} typically employs Newtonian (quadrupolar) order amplitude corrections, with phase corrections accurate to 3.5PN order with respect to the  dominant quadrupolar contribution. In order to understand various systematics present in the parameter estimation studies of our eccentric approximants, we employ versions of the \texttt{TaylorF2} approximant where the Fourier phase expressions are 3PN, 3.5PN, 4PN, and 4.5PN accurate. For the last two versions, we employed Eq. (9) in Ref.~\cite{B45PN_23} which provides a fully 4.5PN-accurate Fourier phase for circular inspirals. In what follows, we list in Table~\ref{table:approximants} all the waveform approximants that we employed for the present set of investigations.\\
+
+% In general, including higher harmonics should improve the parameter estimation and help better constraining various parameters~\cite{}. If we follow similar analysis in Ref.~\cite{Favata2022}, but with sub-dominant harmonics, it can be shown that $\frac{\sigma_{e_0}}{e_0} \approx \left(\sqrt{\sum_{j,n} \Gamma^{j,n}_{e_0e_0}}\right)^{-1} < \left(\sqrt{\Gamma^{(2,-2)}_{e_0e_0}}\right)^{-1}$, and thus reduction in $e_0$ statistical error. 
+% A crude error propagation analysis—performed by taylor expanding $k^{(2)}_{(1)}=\frac{k}{1+k}$ (refer to~\ref{eq:psi_simple} and~\ref{eq:k_simple}) and differentiating it wrt $e_0$—demonstrates that, at leading order, relative errors satisfy $\frac{\Delta k^{(2)}_{(1)}}{k^{(2)}_{(1)}}\sim 2 e_0^2 \frac{\Delta e_0}{e_0}$ at small $e_0$.
+% Consequently, increased uncertainty in $e_0$ leads to higher uncertainty in $k^{(2)}_{(1)}$, resulting in even greater statistical error in $e_0$ at higher values of $m$. 
+% But in GW170817 analysis Sec.\ref{sec:pe_gw170817}, in the parameter range of our interest in $m$--$e_0$ posterior space, this doesn't seem to be the case. 
+% Later, it was found that in such a parameter space, the SNR of \texttt{TaylorF2Ecck} has relatively lower value , thus increasing the uncertainty, underscoring the importance of SNR. This could have resulted from the amplitude modulation due to multiple harmonics (see~\ref{sec:sanity_check}). This increased uncertainty influences how \texttt{TaylorF2Ecck} deviates from \texttt{TaylorF2Ecc} in the $m$--$e_0$ posterior space of our analysis.
+
+% \begin{widetext}
+% \begin{center}
+% \begin{table}[ht!]
+% \centering
+% \begin{tabular}{|c|cccc|cc|}
+% \hline
+% Event Type & \multicolumn{4}{c|}{Eccentric Injection ($e_0=0.1$ at $f_{\text{min}}=20Hz$)} & \multicolumn{2}{c|}{Eccentric vs Circular} \\ \cline{2-7} 
+%  & $m(M_{\odot})$ & $f_{\text{ISCO}}(Hz)$ & T(s) (20Hz-$f_{\text{ISCO}}$) & n cycle & $\Delta$T(s) & $\Delta$n \\ \hline\hline
+% GW170817 (BNS) & 2.73 & 1610.26 & 162.00 & 5221.67 & 6.32 & 159.94 \\ \hline
+% GW190425 (BNS) & 3.40 & 1293.95 & 118.44 & 3813.53 & 4.65 & 117.65 \\ \hline
+% GW150914 (BBH) & 66.20 & 66.41 & 0.69 & 19.43 & 0.04 & 0.96 \\ \hline
+% \end{tabular}
+% \caption{Comparative analysis of gravitational wave events highlighting inspiral durations and phase shifts for eccentric injections with $e_0=0.1$ at 20 Hz. Data presents the time and phase shift changes between eccentric and non-eccentric waveforms, considering dominant harmonics only.}
+% \label{table:cycle}
+% \end{table}
+% \end{center}
+% \end{widetext}
+
+%Information about number of cycles and how it would affect the parameter esmation
+% 1PN accurate analytical expression of orbital phase reads
+
+% \begin{align}
+% \phi=&\, -\frac{1}{32 \eta x^{5/2}}\Biggl[1 - \frac{785 e_0^2}{272 \chi^{19/9}} + x \Bigg\{\frac{3715}{1008} \notag \\ 
+% +&\, \frac{55 \eta}{12} + \left(-\frac{2223905 e_0^2}{274176} + \frac{154645 e_0^2 \eta}{9792}\right)\chi^{-25/9}  \notag \\ 
+% +&\, \left(-\frac{2045665 e_0^2}{225792} - \frac{128365 e_0^2 \eta}{8064}\right)\chi^{-19/9}\Bigg\} \Biggl]
+% \end{align} \label{eq:phase}
+
+\subsection{Waveform Sanity Checks} \label{sec:sanity_check}
+
+\begin{figure*}[ht!]
+    \centering
+    % First plot
+    \hspace*{-0.02\textwidth}%
+    \includegraphics[width=18.2cm]{figs/amplitude_sanity_test_non_zero_e0_low_mass_BBH.pdf} \\
+    \vspace*{0.0\textwidth}%
+    % Second plot
+    \hspace*{-0.02\textwidth}%
+    \includegraphics[width=18.2cm]{figs/amplitude_sanity_test_non_zero_e0_BNS_kink.pdf}
+    \caption{
+    Plot illustrating the amplitude evolution ($|\tilde{h}_+(f)|$) as a function of frequency for  eccentric waveform approximants (\texttt{TaylorF2Ecck}, \texttt{TaylorF2Ecch}) compared to \texttt{TaylorF2Ecc} and the circular \texttt{TaylorF2} model. The top panel uses parameters similar to GW150914 (BBH, short inspiral), while the bottom panel uses parameters similar to GW170817 (BNS, long inspiral), both with an initial eccentricity $e_0 = 0.1$ at $f_0 = 20$~Hz. The amplitude spectral density (ASD) for the LIGO L1 detector at O4 design sensitivity is overplotted for reference. For this moderate, non-negligible value of $e_0$, both \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecch} exhibit distinct amplitude modulations due to multiple harmonics, with \texttt{TaylorF2Ecck} displaying a different modulation morphology resulting from additional sidebands (extra harmonics) and phase shifts in the sub-dominant modes. These modulations appear more frequently in lower-mass systems due to longer inspiral durations. At higher frequencies, as eccentricity decays, the modulations diminish and the waveforms gradually converge to the circular \texttt{TaylorF2} model.
+    }\label{fig:sanity-check1}
+\end{figure*}
+
+
+Initial verifications of our  \texttt{TaylorF2Ecck} eccentric inspiral approximants within the \texttt{LALSimulation} framework were performed by comparing it with \texttt{TaylorF2Ecch} and the well-established \texttt{TaylorF2} and \texttt{TaylorF2Ecc} inspiral template families. These checks focused on computational efficiency, waveform amplitude and phase evolution with frequency, and convergence to the quasi-circular \texttt{TaylorF2}  approximant as eccentricity approaches zero. 
+Further checks were conducted to determine the range of parameter space for which the inclusion of periastron advance becomes important in both matched-filtering searches and parameter estimation. Deviations of \texttt{TaylorF2Ecck} from \texttt{TaylorF2}, \texttt{TaylorF2Ecc}, and \texttt{TaylorF2Ecch} were examined in the $m$--$e_0$ and $\eta$--$e_0$ parameter spaces. 
+All analyses in this section use a minimum frequency of 20 Hz, a choice discussed in detail in Sec.~\ref{sec:analysis_techniques}.
+Additionally, we use {\bf GW170817-like} parameters obtained from the median values of the posterior distribution from a parameter estimation run with \texttt{TaylorF2Ecck} (see Sec.~\ref{sec:pe_gw170817} and Appendix~\ref{sec:full_gw170817} for details).
+It should be noted that \texttt{TaylorF2Ecch} is included in these tests for context only. Its waveform behavior will not be elaborated upon in the results of Section~\ref{sec:sanity_check} and it will not be included in the event analysis of Sec.~\ref{sec:pe_gw170817}.
+%{'mass_1':1.61, 'mass_2':1.18, 'eccentricity':eccn, 'a_1':0., 'a_2':0., 'tilt_1':0., 'tilt_2':0., 'phi_12':0., 'phi_jl':0., 'luminosity_distance':38.87, 'theta_jn':2.52, 'psi':3.293627, 'phase':0., 'geocent_time':1246527184.169434, 'ra':3.45, 'dec':-0.41,}; parameter estimation results detailed in~\ref{sec:pe_gw170817}.
+
+ We typically use $|\tilde{h}_+(f)|$  while probing amplitude evolution of our approximants 
+ and we have checked that the conclusions remain essentially  unchanged if we employ $|\tilde{h}_\times (f)|$.
+ In  Fig.~\ref{fig:sanity-check1}, we display $|\tilde{h}_+(f)|$ for \texttt{TaylorF2Ecck}, \texttt{TaylorF2Ecch}, \texttt{TaylorF2Ecc}, and \texttt{TaylorF2} approximants, using simulated GW150914 (short inspiral, BBH merger) and GW170817 (long inspiral, BNS merger) events to illustrate their behavior for both short and long inspiral scenarios and we let  $e_0 = 0.1$ at 20 Hz.
+Refer to Eq.~(\ref{eq: et}) of Appendix~\ref{sec: et evolution} for the analytical formulation of eccentricity evolution with frequency.
+
+For $e_0 > 0.02$, both \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecch} approximants exhibit visible amplitude modulations due to overlapping harmonic contributions, but the morphology of this modulation is different due to \texttt{TaylorF2Ecck} having extra harmonics due to side band(s), and extra phase shift present in the sub-dominant harmonics.
+For low-(total) mass systems, these approximants exhibit a higher number of modulations per frequency bin
+due to their longer inspiral durations.
+These modulations diminish at higher frequencies as the eccentricity decreases and these waveforms converge towards their circular \texttt{TaylorF2} 
+counterpart.
+This is mainly because these harmonics are inversely proportional to $f^{19/18}$ through the $\chi$ variable as evident from Eqs.~(\ref{eq:xiEcck_simple}).
+Interestingly, we infer that frequency evolution of 
+%Furthermore, a visual inspection of 
+the real part of $\tilde{h}_+(f)$ is fairly similar between our eccentric models
+while diverging from the quasi-circular \texttt{TaylorF2} model.
+
+%as it evolves with frequency $f$, which should not be confused with $|\tilde{h}+|$,  indicates that the phase evolution of the eccentric models during extended inspiral events remains relatively consistent with each other, while diverging from the quasi-circular \texttt{TaylorF2} model. A more detailed analysis of the phase evolution differences is presented below.
+
+% \begin{figure}[ht!]
+% \centering
+% \includegraphics[width=8.52cm]{figs/mismatch_vs_eccn_.pdf}
+% \caption{
+% Plots of `Mismatch percentage'(${\cal M}^*_\%$) as a function of $e_0$ while comparing our 
+%  \texttt{TaylorF2Ecck} approximant with  \texttt{TaylorF2Ecch} (violet band), \texttt{TaylorF2Ecc} (orange band), and \texttt{TaylorF2} (cyan band) approximants.
+%  The colored bands arise as we perform many match computations while varying $m_1$ and $m_2$ values 
+%  of GW170817 in the allowed ranges as given in Fig.~ of \cite{GW170817pe}.
+%  The horizontal dashed line corresponds to ${\cal M}^*_\%=3$, and this could lead to a 10\% signal loss in matched-filtering searches.
+%  Note that $e_0$ values where ${\cal M}^*_\%=3$ vary for different inspiral approximants as expected.
+% Additionally, we overplot 
+% the  difference in log Bayes factor from injection-recovery studies
+% ($\Delta\log_{10}\text{BF}$ as a function of $e_0$ as colored dashed lines while employing 
+% \texttt{TaylorF2Ecch}(ornage)   and \texttt{TaylorF2Ecc}(violet) for recoveries while 
+% choosing only median $m_1$ and $m_2$ values 
+%  of GW170817 due to computational demands.
+% %, coloured dotted lines) versus initial eccentricity ($e_0$) for \texttt{TaylorF2Ecck} compared to \texttt{TaylorF2Ecch} (violet), \texttt{TaylorF2Ecc} (orange), and \texttt{TaylorF2} (cyan). Match test uses varying BNS mass combinations with GW170817 parameters (reason for multiple solid line in each color), while injection-recovery test utilize strict GW170817 parameters. The horizontal dashed lines indicate ${\cal M}^*_\%=3$, corresponding to a 10\% signal loss in matched-filtering searches, and 
+% $\Delta\log_{10}\text{BF}$ values of 1 and 2 indicate the thresholds for strong and decisive waveform distinguishability in parameter estimation, respectively.
+% %Vertical lines indicate median $e_0$ values where ${\cal M}^*_\%=3$, and $\Delta\log_{10}\text{BF}=1$ in \texttt{TaylorF2Ecck} vs \texttt{TaylorF2Ecc}.
+% The intersection of horizontal ${\cal M}^*_\%=3$, and $\Delta\log_{10}\text{BF}=1$ lines 
+% with vertical $e_0$ lines  point to $e_0$ values beyond which
+%  %lines illustrate the approximate $e_0$ values beyond which
+%  the inclusion of eccentricity and periastron advance becomes important for matched-filtering and parameter estimation.}
+% \label{fig:sanity-check2}
+% \end{figure}
+
+\begin{figure*}[ht!]
+    \centering
+    % \hspace*{-0.1\textwidth}%
+    \subfloat[Match Test]{\includegraphics[width=7.5cm]{figs/mismatch_vs_eccn.pdf} \label{fig:mismatch_vs_e0}}
+    \subfloat[Injection-Recovery Test]{\includegraphics[width=7.5cm]{figs/bf_vs_eccn.pdf} \label{fig:injection_recovery}}
+    \caption{
+    Mismatch and Bayes factor comparisons for the \texttt{TaylorF2Ecck} waveform model relative to other inspiral approximants. 
+    %
+    Panel (a) shows the mismatch percentage ($\mathcal{M}^*_\%$) as a function of $e_0$, obtained from match tests comparing \texttt{TaylorF2Ecck} with \texttt{TaylorF2Ecch} (blue band), \texttt{TaylorF2Ecc} (orange band), and \texttt{TaylorF2} (green band). The colored bands represent results from multiple match calculations, varying the component masses $m_1$ and $m_2$ of GW170817 within the permitted binary neutron star prior ranges as outlined in Table 1 of Ref.~\cite{LNB}. The horizontal dashed line, corresponding to the $\mathcal{M}^*_\% = 3$ threshold, marks a 10\% loss in matched-filtering signal power; its intersection points with the median of each band indicate the eccentricities at which waveform differences become statistically significant in matched-filtering searches. Consequently, for matched-filtering searches of BNS events, incorporating eccentricity becomes relevant at $e_0 \gtrsim 0.015$ (when comparing with \texttt{TaylorF2}), while accounting for periastron advance becomes important at $e_0 \gtrsim 0.16$ (vs. \texttt{TaylorF2Ecch}) and $e_0 \gtrsim 0.23$ (vs. \texttt{TaylorF2Ecc}).
+    %
+    Panel (b) shows $\Delta\log_{10}\mathrm{BF}$ as a function of $e_0$ from injection-recovery analyses, comparing the \texttt{TaylorF2Ecck} model with \texttt{TaylorF2Ecch} (blue), \texttt{TaylorF2Ecc} (orange), and \texttt{TaylorF2} (green), using only the median component masses $m_1$ and $m_2$ of GW170817 due to computational constraints. The horizontal dashed lines at $\Delta\log_{10}\mathrm{BF} = 1$ and $2$ represent thresholds for strong and decisive waveform distinguishability in parameter estimation, respectively\cite{Kass01061995}. The $e_0$ values at which the model comparison curves intersect the $\Delta\log_{10}\mathrm{BF} = 2$ line indicate when eccentricity and periastron advance become significant for parameter estimation of GW170817-like events. Following this, for such events, incorporating eccentricity becomes important at $e_0 \sim 0.011$ (when comparing with \texttt{TaylorF2}), and including periastron advance (when comparing with \texttt{TaylorF2Ecch} and \texttt{TaylorF2Ecc}) becomes important at $e_0 \gtrsim 0.06$.
+    }
+\label{fig:sanity-check2}
+\end{figure*}
+To assess the impact of eccentricity and periastron advance on both matched-filtering searches and parameter estimation, and also to facilitate a comparison with the match study presented in Ref.~\cite{TGHH}, we conduct match calculations and injection-recovery tests across a range of $e_0$, $m$ and $\eta$ values. The match  ${\cal M} $ quantifies the phase difference and waveform similarity between two waveform families and it reads~\cite{Damour1998}
+\begin{equation}
+{\cal M}(h_s, h_t) = \max_{t_0, \phi_0} \left\{ 4 \text{Re} \int_{f_{\text{low}}}^{f_{\text{high}}} \frac{\tilde{h}_s^*(f) \tilde{h}_t(f)}{S_h(f)} \, df \right\} \,.
+\label{eq:match_computation}
+\end{equation}
+Note that the above equation 
+%This equation 
+maximizes the overlap integral (the inner product of the frequency-domain waveforms $\tilde{h}_s(f)$ and $\tilde{h}_t(f)$, weighted by the inverse of detector's noise power spectral density (PSD), denoted by $S_h(f)$), with respect to the coalescence time ($t_0$) and the associated phase ($\phi_0$). 
+For our efforts, $S_h(f)$ is given by   LIGO's O4 design sensitivity PSD~\cite{LIGO-T2000012} for the L1 detector.
+%was used for . 
+The integration element $df$ is considered to be $1/\Delta \text{T}$ in the numerical integration, where $\Delta\text{T}$ is the waveform's time-domain duration. 
+For our analysis, we defined and used the mismatch-percentage ${\cal M}^*_\% = (1-{\cal M}) \times 100\%$, instead of ${\cal M}$ values~\cite{Khan2019, Wang2021}.
+%, for better visualization along with injection recovery test Figure~\ref{fig:sanity-check2}.  
+A match of ${\cal M}=0.97$ leads to  ${\cal M}^*_\% =3\%$ and this is generally considered acceptable for matched-filtering searches, corresponding to a signal loss of less than 10\%~\cite{Damour1998}.
+%{\bf incorrect reference: \it Changed}.
+
+For the injection-recovery test, we consider an idealized scenario where \texttt{TaylorF2Ecck} waveform is injected in zero-noise. We then use \texttt{TaylorF2Ecck}, \texttt{TaylorF2Ecch}, \texttt{TaylorF2Ecc} and \texttt{TaylorF2} waveform templates to recover it via Bayesian parameter estimation, employing a reduced 5-parameter space (i.e. $\mathcal{M}$, $q$, $e_0$, $\phi_c$ and $t_c$) instead of the standard 16 parameters~\cite{bilby_paper} to ensure reasonable computational cost. 
+Waveform distinguishability is assessed through differences in the resulting Bayes factors ($\Delta \log_{10} \text{BF}$), with values of $1-2$ indicating strong evidence and $>2$ indicating decisive distinguishability~\cite{Kass01061995}. 
+We also note that alternative (less stringent) distinguishability criteria exist, with a threshold of $\Delta \log \text{BF}=8$ often used as the level of ``strong evidence" in favor of one hypothesis over another (Jeffreys, 1961)~\cite{Jeffreys1961}, which I will simply refer to as Jeffreys' criteria.
+This injection-recovery framework further enables us to explore how \texttt{TaylorF2Ecck} deviates from other waveform families as the injected parameters are varied. In this context, the $\Delta \log_{10} \mathrm{BF} > 2$ criterion serves as a practical proxy for identifying significant waveform differences. The analysis assumes the L1 and H1 detectors operating at their O4 design sensitivity, with corresponding PSDs. The technicalities of parameter estimation and Bayes-Factor calculations are detailed in Sec.~\ref{sec:data_analysis}. 
+%Complete parameter estimation configuration and results are in the reference resource~\cite{}.
+
+Fig.~\ref{fig:sanity-check2} presents a comparative analysis of the \texttt{TaylorF2Ecck} approximant against other template families using the match calculations and injection-recovery tests. In Fig. \ref{fig:mismatch_vs_e0}, ${\cal M}^*_\%$ is shown as a function of $e_0$, where three colored bands correspond to match calculations between \texttt{TaylorF2Ecck} and i) \texttt{TaylorF2Ecch}, ii) \texttt{TaylorF2Ecc}, and iii) \texttt{TaylorF2} approximants, respectively. Each band reflects multiple match computations with varying component masses ($m_1, m_2 \in [1 M_{\odot}, 3 M_{\odot}] $) within the BNS prior range used in Ref.~\cite{LNB}.
+%, while other parameters are fixed to be similar to GW170817 values~\cite{LVK_GW170817}.
+%Detailed analysis of ${\cal M}^*_\%$ dependence on the parameter space of $e_0$, $m$ and $\eta$ is explored later. 
+%The choice of using ${\cal M}^*_\%$ instead of ${\cal M}$ is to show a comparative waveform divergence with that of $\Delta\log_{10}\text{BF}$.
+We employ ${\cal M}^*_\%$ rather than ${\cal M}$ to facilitate easy comparisons
+of results that arise from 
+%of waveform divergence with
+the distinguishability metric, $\Delta\log_{10}\text{BF}$.
+
+Fig.~\ref{fig:injection_recovery} displays $\Delta\log_{10}\text{BF}$ values from the injection-recovery test, where signals are generated with our \texttt{TaylorF2Ecck} inspiral waveform family, using the GW170817-like parameters.
+%Fig.~\ref{fig:injection_recovery} displays $\Delta\log_{10}\text{BF}$ values from the injection-recovery test, where signals are generated with our \texttt{TaylorF2Ecck} inspiral family for GW170817's median parameter values, as given in \cite{LVK_GW170817}.
+The relevant parameters 
+are recovered using \texttt{TaylorF2Ecck}, \texttt{TaylorF2Ecch}, \texttt{TaylorF2Ecc}, and \texttt{TaylorF2} inpsiral template families. Unlike match calculations, this analysis does not include multiple parameter estimation runs while varying injected mass parameters due to their higher computational costs. %Consequently, the results may vary depending on the parameter sets used.
+Injections were performed at four discrete $e_0$ values between 0.0 and 0.2 for each comparison. After the recovery, discrete values of $\Delta\log_{10}\text{BF}$ were interpolated using cubic splines. 
+We observe mild variations in these results when we change mass parameters appropriate for GW170817. 
+% Possible error in the $\Delta\log_{10}\text{BF}$ values is ignored in our analysis, and this won't significantly affect the result.
+
+We now discuss our inferences from plots present in Fig.~\ref{fig:sanity-check2}.
+The quasi-circular \texttt{TaylorF2} waveform diverges rapidly, exceeding 3\% mismatch at $e_0 \sim 0.015$. At low eccentricities, all eccentric waveforms exhibit similar phase evolution. The \texttt{TaylorF2Ecch} and \texttt{TaylorF2Ecc} models reach 3\% mismatch at $e_0 \sim 0.16$ and $e_0 \sim 0.23$, respectively, slightly lower than the $e_0 \sim 0.25$ reported in~\cite{TGHH} (which compared eccentric models with and without periastron advance effects), likely due to differences in the employed PSDs and 
+the use of beyond-leading order eccentric corrections in \cite{TGHH}.
+Injection-recovery tests indicate that \texttt{TaylorF2Ecck} becomes distinguishable from \texttt{TaylorF2Ecch} and \texttt{TaylorF2Ecc} at $e_0 \gtrsim 0.05$ and decisively preferred at $e_0 \gtrsim 0.06$. This provides insights into the $e_0$ parameter space region where the periastron effect significantly influences parameter estimation.
+However, \texttt{TaylorF2Ecc} and \texttt{TaylorF2Ecch} successfully recovered injected parameters within 90\% credible intervals even for $e_0 > 0.15$
+%, albeit with increased uncertainties (see Fig.~\ref{})
+. In contrast, \texttt{TaylorF2} failed to recover the injected mass parameters even at $e_0 \geq 0.01$, producing inaccurate parameter estimation posteriors for GW170817-like events with $e_0 \geq 0.01$. 
+Furthermore, \texttt{TaylorF2Ecck} becomes distinguishable from \texttt{TaylorF2} at $e_0 \gtrsim 0.011$, thus inferring a region in $e_0$ space where the eccentricity effect is expected to significantly influence parameter estimation.
+Additional posterior plots of these analyses are included in Appendix~\ref{sec:appendix_injection_recovery}.
+
+To examine deviations between template families and underlying correlations in 
+relevant 
+parameters, we conduct several match tests in $e_0$--$m$ and $e_0$--$\eta$ parameter spaces.
+ Unless stated otherwise, the remaining parameters are set to the GW170817-like parameter values.
+ %while using the GW170817-like parameters for the remaining, unless stated otherwise. 
+ While similar investigations with injection-recovery tests are
+%computationally
+prohibitively
+expensive, we could infer the rough behavior of such parameter estimation studies from our match tests. 
+The plan is to use changing ${\cal M}^*_\%$ values as a proxy for waveform deviations and the inclined lines of non-changing ${\cal M}^*_\%$ values to indicate parameter correlations (see Fig.~\ref{fig:contour_mismatch}). 
+We note that such correlations should not be confused with those arising from our detailed parameter estimation posterior plots. The behavior observed in these tests when comparing \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} will be revisited during the comparison of parameter estimation results for GW170817 in Sec.~\ref{sec:pe_gw170817}.
+
+\begin{figure*}[ht!]
+    \centering
+    \hspace*{-0.015\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=19.7cm]{figs/mismatchvalues_EcckVsEcc_fixed_q_EcckVsEcc.pdf}\label{e0_m_ecc}
+    \hspace*{-0.03\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=20cm]{figs/mismatchvalues_EcckVsEcc_fixed_mtot_EcckVsEcc.pdf}\label{e0_eta_ecc}
+    \vspace{0.0\textwidth}%
+    \caption{%context
+    Mismatch percentage (${\cal M}^*_\%$) contours illustrating the deviation between the \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} waveform approximants, used to probe the impact of periastron advance and additional harmonics. 
+    %content
+    The top panel shows ${\cal M}^*_\%$ as a function of $m$ and $e_0$ (evaluated at 20~Hz) for a fixed $\eta$. The bottom panel displays ${\cal M}^*_\%$ as a function of $\eta$ and $e_0$ for a fixed $m$. White dashed lines indicate parameters corresponding to a GW170817-like binary neutron star system. The deviation between the models increases with both $e_0$ and $m$, accompanied by a negative correlation in the $e_0$--$m$ plane (top panel). A similar, though weaker, negative correlation is observed in the $e_0$--$\eta$ plane (bottom panel), where the variation in ${\cal M}^*_\%$ with $\eta$ is significantly smaller than with $m$, particularly at lower values of $e_0$.
+    }
+    \label{fig:contour_mismatch}
+\end{figure*}
+Fig.~\ref{fig:contour_mismatch} illustrates how ${\cal M}^*_{\%}$ varies with changes in $m$, $e_0$, and $\eta$ when comparing \texttt{TaylorF2Ecck} with \texttt{TaylorF2Ecc}, in order to probe the impact of including periastron advance and additional harmonics. An extended comparison involving \texttt{TaylorF2Ecch} and \texttt{TaylorF2} is provided in Appendix\ref{sec:match_test_appendix}.
+%
+When comparing \texttt{TaylorF2Ecck} to \texttt{TaylorF2Ecc}, the deviation between the models increases with both $e_0$ and $m$, accompanied by a negative correlation (see top panel of Fig.~\ref{fig:contour_mismatch}). 
+A similar trend is observed in the $e_0$--$\eta$ plane, where a weaker but still negative correlation appears (see bottom panel of Fig.~\ref{fig:contour_mismatch}). 
+Moreover, the variation in ${\cal M}^*_{\%}$ with increasing $\eta$ at fixed $e_0$ is notably smaller, and negligible at lower $e_0$, compared to the variation observed with increasing $m$.
+
+To conclude, \texttt{TaylorF2Ecck} diverges from \texttt{TaylorF2} even at small eccentricities ($e_0\gtrsim 0.011$) during  parameter estimation results, where eccentricity correction is important. 
+The $e_0$ limits from Ref.~\cite{Favata2022} have a similar conclusion, indicating significant systematic bias when eccentricity is ignored, $e_0\gtrsim 0.01$ at 10 Hz. 
+% If we project their $e_0$ limit using the eccentricity evolution equation (see Eq.~(\ref{}) in Appendix~\ref{}) at 20Hz., then we have the limit at $e_0\sim0.005$.
+Moreover, periastron effect becomes important at small eccentricities of $e_0\gtrsim 0.06$. It is important to remember that these injection-recovery tests are conducted in an idealized scenario with zero noise, O4 design sensitivity (as the analysis PSD), and a reduced parameter space; conservative estimates (stricker, more realistic estimates) are expected to be higher than these values.
+%
+
+Following these results, we can, in general, consider posterior values of $e_0\lesssim 0.011$ as essentially representing zero eccentricity for BNS (GW170817-like) events, since this is the regime where eccentric and circular waveform models become indistinguishable 
+%(one hypothesis doesn't favour the other)
+in parameter estimation, as reflected in their Bayes factors.
+However, it's important to note that at low SNR or at higher values of $m$ or both, the uncertainty in $e_0$ will be higher~\cite{Favata2022}, and the upper limit of 90\% credible interval might extend beyond this value, even when the event is circular in nature. 
+To further investigate such scenario, we repeated similar injection-recovery tests for a GW190425-like event, in a manner analogous to the analysis performed with the GW170817-like event, to compare the eccentric \texttt{TaylorF2Ecck} and quasi-circular \texttt{TaylorF2} templates. Because of the higher mass and lower SNR associated with this event, we observed that \texttt{TaylorF2Ecck} becomes distinguishable from TaylorF2
+at a slightly higher value of $e_0\gtrsim 0.018$, and strongly distinguishable at $e_0\gtrsim 0.028$ according to Jeffreys' criteria (for the extended results, refer to Fig.~\ref{fig:injection_recovery_appendix_GW190425} in Appendix~\ref{sec:appendix_injection_recovery}). 
+%
+Furthermore, \texttt{TaylorF2} failed to recover the injected mass parameters for $e_0 \gtrsim 0.02$.
+In what follows, for parameter estimation in Sec.~\ref{sec:pe_gw170817}, we will consider a value $e_0$ as essentially zero eccentricity (or negligible eccentricity) if the 90\% credible interval from parameter estimation with a uniform $e_0$ prior is below a conservative value of 0.011 for GW170817 and 0.028 for GW190425. We also consider the result from parameter estimation with log-prior on $e_0$ as an additional sanity check for the presence or absence of residual eccentricity in the events.
+Moreover, the sanity tests in this section also indicate that, when $e_0\neq 0$, \texttt{TaylorF2Ecck} should diverge noticeably from \texttt{TaylorF2Ecc} in parameter estimations within the $e_0$--$m$ parameter spaces (similarly in $m$--$e_0$ space). This observations will be investigated in the parameter estimations of GW170817 and GW190425.
+
+% These tests highlight the importance of including eccentricity in waveform models, as neglecting it can lead to inaccuracies for pure-inspiral template families even at small eccentricities ($e_0\gtrsim0.015$) for GW detection. Periastron effects become significant for precision data analysis at $e_0 \gtrsim 0.05$, although their impact on matched-filtering searches is less pronounced even beyond $e_0 = 0.1$. The observed correlation between ${\cal M}^*_\%$ and $m$ indicates that incorporating the \texttt{TaylorF2Ecck} approximant will be increasingly crucial for pure-inspiral analyses of higher-mass BNS, NSBH, and low-mass BBH systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{ Data-analysis and parameter estimation }
+\section{Bayesian Parameter Estimation Studies On Pure Inspiral Events}
+\label{sec:data_analysis}
+
+This section presents Bayesian parameter estimation studies conducted on a couple of pure inspiral GW events. We first provide a brief overview of the Bayesian methodology, widely used within the LVK collaboration for GW data analysis \cite{creightonanderson2011, Sivia2006, bilby_paper}.
+This is followed by a detailed description of our parameter estimation studies on a couple of pure inspiral events, comparing our eccentric inspiral templates with existing waveform families and exploring their astrophysical and data-analysis implications.
+%This is followed by a detailed description of the parameter estimation studies, comparing our eccentric inspiral templates with existing waveform models, and exploring the implications of incorporating eccentricity in the analysis and addressing the need to expand such implementation to higher PN orders. 
+ % This section provides a brief description of the Bayesian parameter estimation (parameter estimation) approach, widely used to perform data analysis and estimate the parameters of GW events in the LVK collaboration. This is followed by detailed description of parameter estimation studies of a couple of pure inspiral GW events using our eccentric inspiral templates in comparison to other waveform and the probing of their implications.
+
+\subsection{ Bayesian Inference Framework} \label{sec:analysis_techniques}
+
+Bayesian inference provides a robust framework for estimating various orbital parameters of GW events.  This approach involves fitting the observed data, $d(t)$, with a chosen inspiral template family, $H$, under the assumption of Gaussian detector noise. The posterior probability density, ${\cal P}(\theta | d(t), H)$, for the source parameters $\theta$ given the data and the model is obtained via Bayes' theorem, as
+%  We begin by outlining the basic data analysis technique, namely the Bayesian inference method, implemented 
+% in the \texttt{Bilby} Python package~\cite{bilby_paper, bilby_pipe_paper} for the parameter estimation studies of GW events so as to ensure accuracy and mitigate biases.
+%  %This study employs a detailed data analysis technique within the framework of gravitational wave (GW) data analysis or parameter estimation (parameter estimation), which is essential to ensure accuracy and mitigate biases. At its core, GW data analysis involves fitting a waveform template to signal data, framed probabilistically within the parameter space using Bayesian inference. 
+%  This approach involves fitting the aLIGO-Virgo data ($d(t)$) with an inspiral template family (H) 
+%  while assuming  Gaussian noise in detectors.
+%  The 
+% %Assuming a GW model (H) and Gaussian noise in detectors, 
+% posterior probability density, ${\cal P}(\theta | d(t), H)$, is provided via the Bayes theorem which reads
+%is calculated using the aLIGO-Virgo data ($d(t)$).
+\begin{equation}
+{\cal P}(\theta | d(t),H) = \, \frac{{\cal L}(d(t) | \theta,H) \, \pi(\theta | H)}{{\cal Z}(d(t) | H)} \,, \label{eq:bayes_theorem}
+\end{equation}
+where ${\cal L}(d(t) | \theta, H)$ is the likelihood function, $\pi(\theta | H)$ is the prior distribution for the parameters, and ${\cal Z}(d(t) | H)$ is the Bayesian evidence given by
+\begin{equation}
+{\cal Z}(d(t) | H) = \int {\cal L}(d(t) | \theta,H) \, \pi(\theta | H) \, d\theta \label{eq:evidence}\,.
+\end{equation}
+
+Note that 
+the likelihood function quantifies the agreement between the data and the model for a given set of parameters, weighted against the Gaussian noise profile. For our analysis, we employ the \texttt{Bilby} Python package~\cite{bilby_paper, bilby_pipe_paper}, which implements both Nested Sampling and Markov-Chain Monte Carlo (MCMC) algorithms for posterior distribution computations.
+The Nested Sampling, as compared to MCMC used in Ref.~\cite{LNB}, is particularly advantageous for model comparison in higher-dimensional parameter spaces, as it provides an estimate of the Bayesian evidence, allowing for the calculation of the Bayes factor.
+This 
+%Bayes
+factor for a given parameter estimation is given by ${\cal B} = {\cal Z}/{\cal Z}_{\rm noise}$, and for two parameter estimation studies  with model A and B by ${\cal B}_B^A = {\cal Z}_A/{\cal Z}_B$.
+Note that ${\cal B}_B^A$ quantifies the relative evidence for one model over another, allowing for a robust assessment of comparative model performance in signal recovery. For waveform comparisons in our analysis, we use the metric $\Delta{\rm log}_{10}{\rm BF}={\rm log}_{10}({\cal B}_B^A)$, already employed in the injection-recovery tests in Sec.~\ref{sec:sanity_check}. In addition, we employ parameter-specific metrics, for intuitive comparison between our posterior distributions: the percentage difference in median values (\%$\Delta \mathrm{Median}$), and the overlap of the 90\% credible intervals (${\cal O}_{\rm CI}^{90\%}$). The percentage difference in median values is defined as
+
+\begin{equation}
+\% \Delta \mathrm{Median} = \frac{|{\rm Med}_1 - {\rm Med}_2|}{\frac{{\rm Med}_1 + {\rm Med}_2}{2}} \times 100\%\,,
+\end{equation}
+
+where ${\rm Med}_1$ and ${\rm Med}_2$ are the median values of a parameter from the two comparing models. The overlap of the 90\% credible intervals is calculated by
+
+\begin{equation}
+{\cal O}_{\rm CI}^{90\%} =
+\begin{cases}
+0\% & \text{, if } l_1 > u_2 \text{ or } \\ &\;\;l_2 > u_1 \\
+\frac{\min(u_1, u_2) - \max(l_1, l_2)}{\min(u_1 - l_1, u_2 - l_2)} \times 100\% & \text{, otherwise} \,,
+\end{cases}
+\end{equation}
+
+where $l_1$ and $u_1$ are the lower and upper bounds of model A’s 90\% credible interval, and $l_2$ and $u_2$ are those from model B. 
+Derived from fundamental statistical principles~\cite{Gelman2003, Sivia2006}, these two additional metrics together indicate the proximity of two posterior distributions of a parameter for two comparing waveform models. Specifically, $\% \Delta \mathrm{Median}$ quantifies the relative difference in central tendency and assesses systematic shifts, while ${\cal O}_{\rm CI}^{90\%}$ quantifies overlap or consistency of estimated uncertainties provided by the 90\% credible interval.
+%{\bf please list a reference.. standard text book .. if it is not widely used .. a line about why you employ these quantities}
+%{\it  I have derived this formula using basic statistical knowledge. But I have added citation similar to this, as reference}
+% https://pmc.ncbi.nlm.nih.gov/articles/PMC4877414/
+
+Our eccentric inspiral template families are implemented in \texttt{LALSimulation}, which is part of the \texttt{LALSuite} and written primarily in C for computational efficiency.  \texttt{Bilby} is then used to interface with \texttt{LALSimulation} for parameter estimation studies. Detailed settings and all parameter estimation results for this literature are stored in~\cite{TaylorF2EcckRepo}.
+We ignored tidal effects for our parameter estimation runs while  prior distributions are set similar to Ref.~\cite{LNB}. 
+We typically let spin parameters to be zero unless stated otherwise, especially when employing templates for quasi-circular inspiral.
+
+The choice of analysis duration and $f_\text{min}$ significantly impacts both the accuracy and computational costs of our parameter estimation runs. To capture eccentricity effects, the maximum possible data length, determined by the mass-prior, should be used.
+For mass priors with $m_1,\,m_2\in [1M_{\odot}, 3M_{\odot}]$, the maximum data length corresponds to $\sim309$ seconds (1.1 times the chirp time ~\cite{lalsuite}) for a 1$M_{\odot}$-1$M_{\odot}$ system, and it exceeds typical LVK analysis durations for BNS events (128-190 seconds) \cite{GW170817pe,LNB}. 
+Although lowering $f_\text{min}$ could improve eccentricity measurement\cite{Favata2022, gupte2024}, it drastically increases computational demands; for instance, decreasing $f_\text{min}$ from 20 Hz to 10 Hz for GW170817 would require a sixfold increase in data duration.
+Furthermore, the detector noise at 10 Hz is significantly higher than at 20 Hz~\cite{Sun2020, Sun2021}, and potentially reducing the SNR and introducing additional uncertainties. Given these factors, and the recommendation of Ref.~\cite{emma2024} that 20 Hz is optimal for parameter estimation, we set $f_\text{min}$ to 20 Hz, acknowledging the potential loss of information below this frequency. 
+To manage computational cost and achieve a reasonable parameter estimation run within a week, we also set the sampling frequency to 2048 Hz and $f_{\rm max}$ to 256~Hz for GW170817. This choice is justified given that our primary interest lies in the inspiral phase, particularly the early inspiral where signatures of residual eccentricity, if present, are expected to be most pronounced. This approach is further supported by similar strategies in recent literature, such as the use of $f_{\rm max} = 280$~Hz to investigate eccentricity in the inspiral phase of a NS-BH system\cite{Morras2025b}.
+%While for GW190425, which has higher mass has and shorter signal, we used resctricted mass prior and correspoding data lennth of 190s and set the sampling frequency to 2048 Hz and $f_{\rm max}$ to 512 Hz. 
+%{\bf a line about noisy data at 10 Hz should be mentioned too}
+
+The PSD for each analysis is estimated from up to 1024~s of pre-event strain data using Welch’s method, as implemented in \texttt{bilby\_pipe}~\cite{bilby_pipe_paper}. The data are divided into segments with analysis duration, 309~s for GW170817 and 160~s for GW190425, with 50\% overlap, each tapered by a Tukey window with a 0.4~s roll-off. The median power spectrum across all segments is computed to yield a typical PSD estimate for parameter estimation.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{ Event tests: Parameter estimation of GW170817 and GW190425 } \label{sec: event tests}
+\subsection{Parameter estimation implications of \texttt{TaylorF2ecck} approximant for Pure Inspiral Events GW170817 and GW190425}\label{sec:pe_gw170817}
+
+\begin{figure*}[ht!]
+    \centering
+    \hspace*{0.00\textwidth}%
+    \subfloat[Waveform comaprison plot]{\includegraphics[width=0.505\textwidth]{figs/GW170817a.pdf} \label{fig:pe_comparison}}
+    \hspace*{0.00\textwidth}%
+    \subfloat[Waveform context plot]{\includegraphics[width=0.505\textwidth]{figs/GW170817c.pdf}\label{fig:pe_context}}
+    \caption{%context
+    Corner plots showing the posterior distributions of ${\cal M}$, $q$, and $e_0$ from parameter estimation for GW170817. The 2D contours represent the $1\sigma$ and $2\sigma$ credible intervals, enclosing 39.3\% and 86.4\% of the posterior samples, respectively.
+    %content
+    The left panel (a) compares two non-spinning, 3PN-accurate eccentric inspiral waveform models: \texttt{TaylorF2ecck} (Ecck 3PN) and \texttt{TaylorF2ecc} (Ecc 3PN). While this panel provides our primary comparison, the right panel (b) offers additional context by comparing \texttt{TaylorF2ecck} with the LALSuite-standard, but non-spinning, \texttt{TaylorF2ecc} (Ecc 3.5PN), which includes 3.5PN-order contributions to the circular part of the Fourier phase.
+    %conclusion
+    In the left panel, both 3PN models constrain the residual eccentricity to be negligible ($e_0 \lesssim 0.01$). At these low eccentricities ($\lesssim 0.01$), the comparison between the Ecck 3PN and Ecc 3PN models reveals subtle differences in the joint posteriors involving mass and eccentricity (e.g., ${\cal M}$--$e_0$ and $q$--$e_0$ planes), while the 1D marginalized distributions show no significant variation due to the inclusion of additional harmonics or periastron advance in \texttt{TaylorF2ecck}. However, the right panel shows a substantial bias in the $q$ posterior when comparing the 3PN models to the 3.5PN \texttt{TaylorF2ecc}, highlighting the influence of higher-order circular phase corrections. Notably, the inclusion of 3.5PN circular phasing in \texttt{TaylorF2Ecc} has a negligible impact on its $e_0$ constraint, as the eccentricity implementation in this approximant is limited to 3PN order.
+    }
+\label{fig:pe_gw170817}
+\end{figure*}
+We are now in a position to pursue parameter estimation studies of our eccentric approximants while employing data associated with pure inspiral events. This effort primarily aims to investigate the data analysis implications of \texttt{TaylorF2ecck} and compare them with parameter estimation results while using 
+the  \texttt{TaylorF2ecc} approximant, 
+%for which parameter estimation results have been previously 
+reported in Refs.~\cite{LNB, Favata2022}.
+Parameter estimation with the \texttt{TaylorF2Ecck} approximant poses significant computational challenges due to its complex harmonic structure and the prolonged duration of BNS signals. For instance, our Bayesian parameter estimation runs for GW170817 using \texttt{TaylorF2Ecck} took more than a week to complete, whereas the same analysis with the \texttt{TaylorF2Ecc} approximant required only half of the time. To mitigate this computational burden, we adopted the prior outlined in the Ref.~\cite{LNB}, which utilizes electromagnetic counterpart data for GW170817 to fix the sky localization and constrain the luminosity distance prior to a Gaussian distribution about 40.7 Mpc. However, this approach is not feasible for GW190425 event, which lacks an electromagnetic counterpart and has a lower network signal-to-noise ratio (SNR) of $\sim$13 compared to GW170817’s SNR of $\sim$33. This lower SNR complicates parameter constraints for GW190425, yet its inclusion in our study demonstrates that key findings from GW170817 extend to other BNS inspiral events. 
+
+% talk about extra comparison
+% Additionally, we incorporate parameter estimation data from the LVK consortium, which employed the \texttt{IMRPhenomPv2NRT} waveform—a phenomenological model that accounts for spin precession effects under a low-spin prior. While the detailed implications of spin effects exceed the scope of this paper, the inclusion of 
+% LVK results provides a broader contextual understanding of our findings.
+While a detailed analysis of spin effects is beyond the scope of this paper, Fig.~\ref{fig:pe_gw170817_compare} in Appendix\ref{sec:full_gw170817} offers a broader context. It compares posteriors from our 3PN-accurate \texttt{TaylorF2ecck} approximant with those from: (i) the standard full-\texttt{TaylorF2ecc} approximant (incorporating leading-order spin effects and 3.5PN circular contributions to its Fourier phase) using our parameter estimation results; (ii) the same full-\texttt{TaylorF2ecc} model analyzed by Lenon et al. 2020 (LNB)~\cite{LNB} with differing parameter estimation settings; and (iii) the fully circular \texttt{IMRPhenomPv2NRT} family, employed by the LVK consortium.
+
+\begin{figure}[ht!]
+    \centering
+    \hspace*{-0.02\textwidth}%
+    \includegraphics[width=8.52cm]{figs/GW170817_mtot_eta_e0_edited.pdf}
+    \caption{Plot shows contour plots for $m$ vs $e_0$ (left) and $\eta$ vs $e_0$ (right), while comparing the waveform approximants \texttt{TaylorF2ecck} (Ecck, in blue) and \texttt{TaylorF2ecc} (Ecc, in orange). The plot shows posterior distribution accociated with GW170817. Contour lines indicates (1, 2)-sigma or 39.3\% and 86.4\% of the posterior distribution. The plot shows positive correlation for $m$ vs $e_0$ and negative correlation for $\eta$ vs $e_0$. Ecck deviates more from Ecc at higher value of $m$ indicating the dependence of periastron effect on PN parameter.  
+    %Ecck deviates more from Ecc at lower value of $\eta$, shows shift due to k is less pronounce at lower $\eta$. 
+} \label{fig:correlation_gw170817}
+\end{figure}
+Fig.~\ref{fig:pe_gw170817} presents a comparative analysis of the posterior distributions for ${\cal M}$, $q$, and $e_0$ obtained from GW170817 parameter estimation using the \texttt{TaylorF2ecck} and \texttt{TaylorF2ecc} waveform approximants. Complementary to this, Fig.~\ref{fig:correlation_gw170817} illustrates degeneracies and correlations in the joint posterior distributions across the $m$--$e_0$ and $\eta$--$e_0$ planes. Our primary comparison in Fig.~\ref{fig:pe_comparison} focuses on non-spinning, 3PN-accurate eccentric waveform models, while Fig.~\ref{fig:pe_context} includes the 3.5PN version of \texttt{TaylorF2ecc}, with higher-order corrections applied only to the circular part of the phasing, to highlight potential biases introduced by such terms. Initial observations from Fig.~\ref{fig:pe_context} suggest that, at the negligible eccentricities inferred for GW170817, the 3PN \texttt{TaylorF2ecck} and 3PN \texttt{TaylorF2ecc} models yield broadly consistent parameter constraints. However, a notable bias emerges in the $q$ posterior when comparing the 3PN \texttt{TaylorF2ecck} to the 3.5PN-corrected \texttt{TaylorF2ecc}, with the latter displaying a distinct shift in the posterior peak. This finding requires further explorations as eccentric contributions are fully known only upto the 3PN order.
+% Fig.~\ref{fig:pe_gw170817} presents a comparative analysis of the posterior distributions for ${\cal M}$, $q$, and $e_0$ across the waveform approximants \texttt{TaylorF2ecck} and \texttt{TaylorF2ecc}, resulting from GW170817 parameter estimation analysis. Additionally, Fig.~\ref{fig:correlation_gw170817} shows degeneracy and correlation in $m$--$e_0$ and $\eta$--$e_0$ posterior-contour plots from the analysis. 
+% The primary comparison focuses on the 3PN waveforms Fig.~\ref{fig:pe_comparison}, while the 3.5PN waveform inclusion in Fig.~\ref{fig:pe_context} serves to illustrate potential biases introduced by the incorporation or lack of higher-order circular PN phasing corrections. Initial observation of the posterior distributions indicates that, at this negigible eccentricity, \texttt{TaylorF2ecck} and \texttt{TaylorF2ecck} constrains parameters fairly similarly, which will be elaborated below; while the inclusion of higher-order circular PN phasing corrections in \texttt{TaylorF2ecc} shows substaintialy bias in $q$ posterior with a distinct peak when comapring with \texttt{TaylorF2ecck}. 
+% However, this requires further explorations as eccentric contributions are fully known only upto 
+% the 3PN order.
+%However, a closer examination reveals that incorporating 3.5PN corrections can shift these distributions, emphasizing the influence of higher PN orders on parameter estimation accuracy.
+
+% Fig.~\ref{fig:injection_recovery1} in Appendix~\ref{sec:appendix_injection_recovery} for the injection-recovery test posterior plot with $e_0 = 0.01$ injection for a GW170817-like event). 
+%This aligns with the inference, drawn from our match test in $e_0$--$m$ parameter space in Section~\ref{sec:sanity_check} (see Fig.~\ref{fig:contour_mismatch}), that \texttt{TaylorF2Ecck} deviates from \texttt{TaylorF2Ecc} with increasing $m$, while the deviation is negligible with increasing $\eta$ at small values of $e_0$. The increased difference in the posterior distributions with decreasing $\eta$ in Fig.~\ref{fig:correlation_gw170817} (right), is due to the negative correlation that exist between $m$ and $\eta$, i.e. a higher posterior value of $m$ corresponds to a smaller posterior value of $\eta$ (see the the extended parameter posterior plot for GW170817 in Fig.~\ref{fig:GW170817_full_pe} of Appendix~\ref{sec:full_gw170817} for the $m$-$\eta$ correlation).
+%To explain the increased difference in the posterior distributions with decreasing $\eta$ in Fig.~\ref{fig:correlation_gw170817} (right), it's important to note the negative correlation that exist between $m$ and $\eta$, induce by the tight constraint on ${\cal M}$ in this long inspiral signal and expressed through the relationship ${\cal M}=\eta^{3/5} m$ (also see the the extended parameter posterior plot for GW170817 in Fig.~\ref{fig:GW170817_full_pe} of Appendix~\ref{sec:full_gw170817} for the $m$-$\eta$ correlation). Consequently, a higher posterior value of $m$ corresponds to a smaller posterior value of $\eta$, which explains why there is a greater difference in the \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} posterior distributions with decreasing $\eta$ values.
+% Finally, for both waveform templates, the statistical uncertainty of $e_0$, indicated by the vertical width of (1, 2)-sigma contours in $e_0$ direction, decreases with decreasing $m$.
+% This behavior is similar to that inferred in Ref.~\cite{Favata2022} using Fisher analysis with full-\texttt{TaylorF2Ecc}, where the statistical uncertainty or fractional error of $e_0$ (indicated by $\sigma_{e_0}/e_0$) decreases with $m$ due to the increase in the number of wave cycles in the detector band.
+
+% When comparing \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} for GW170817 in Fig.~\ref{fig:correlation_gw170817}, a positive correlation is seen between $e_0$ and $m$, which is primarily influenced by the first $e_0$ correction term in $\psi$ as evident from
+% Eq.~(\ref{eq:psi_simple}).
+% {\bf WRONG}
+% The tight constraint on ${\cal M}$ in this long inspiral signal induces a negative correlation between $m$ and $\eta$, expressed through the relationship ${\cal M}=\eta^{3/5} m$ (see Fig.~\ref{fig:GW170817_full_pe}).
+% {\bf Explain what this Fig 9 displays}
+% Consequently, for this particular event, a primary reason for the negative correlation observed between $\eta$ and $e_0$ in Fig.~\ref{fig:correlation_gw170817} (left). 
+% {\bf what is THE PRIMARY REASON.. lines are circular }
+% Additionally, \texttt{TaylorF2Ecck} shows more deviation from \texttt{TaylorF2Ecc} at higher m, influenced by the effects of periastron advance, through the PN parameter $x$, which enter the compact binary dynamics at the 1PN order. Similar influences on how \texttt{TaylorF2Ecck} deviate from \texttt{TaylorF2Ecc} are also visible in Fig.~\ref{fig:contour_mismatch}. 
+% {\bf this makes NO sense}
+% For both waveforms, statistical uncertainty of $e_0$ increases with increasing $m$, a point that is also noted in Eq.~(4.18b) of Ref.~\cite{Favata2022} for the \texttt{TaylorF2Ecc} waveform.
+% {\bf How can an Eq points to such a line}
+
+For GW170817, all eccentric \texttt{TaylorF2} family waveforms favor essentially zero eccentricity. 
+Using a uniform (log-uniform) prior on $e_0$, the 90% credible intervals from our parameter estimations are $e_0\leq0.009$ ($e_0\leq0.006$) for \texttt{TaylorF2ecck} and $e_0\leq0.005$ ($e_0\leq0.004$) for \texttt{TaylorF2Ecc} (see Table~\ref{tab:e0_waveform_comparison} and Fig.~\ref{fig:GW170817_full_pe} for more details on the parameter estimation results). 
+In contrast, LNB while employing full-\texttt{TaylorF2Ecc} approximant reports 90\% credible interval of $e_0 \leq 0.024$ at 10 Hz using uniform prior, and their data shows $e_0 = 0.006^{+0.007}_{-0.005}$ at 20 Hz. 
+The $e_0$ constraints obtained in our posterior results are notably lower than the $0.011$ threshold identified through injection-recovery tests (see Fig.~\ref{fig:injection_recovery}), and thus indicate negligible eccentricity. 
+%Our results, however, provide tighter constraints on $e_0$ at 20 Hz.
+% our Ecc3.5spin provide quntile[0.5, 0.05, 0.95]=0.0018,0.00018,0.0049
+Moreover, we observed that inclusion of 3.5PN phasing in \texttt{TaylorF2Ecc} has negligible impact on the $e_0$ constraint as the implementation of eccentricity is limited to 3PN for this approximant.
+%This threshold represents the point where \texttt{TaylorF2Ecck} begins to show a significant divergence from the circular \texttt{TaylorF2} waveform.
+ Furthermore, a Bayes factor comparison between \texttt{TaylorF2ecck} and \texttt{TaylorF2Ecc} shows no strong preference for either model (with $\Delta{\rm log}_{10}{\rm BF} < 1$), suggesting that the impact of eccentricity remains minimal in this scenario.
+%This aligns with the broader findings\cite{LNB, others} that eccentricity plays a negligible role in these pure inspirals events.
+
+Fig.~\ref{fig:correlation_gw170817} provides posterior contour plot comparisons between the \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} in the $m$--$e_0$ and $\eta$--$e_0$ parameter spaces for the GW170817 event. The figure shows degeneracies between $e_0$ and the mass parameters, with an additional correlation visible in the higher $e_0$ region ($>0.002$). A positive correlation is observed between $m$ and $e_0$, while a negative correlation is observed between $\eta$ and $e_0$. 
+These correlations are consistent with results from our injection-recovery test with small eccentricity (see Fig.~\ref{fig:injection_recovery1} in Appendix~\ref{sec:appendix_injection_recovery}  for the posterior plot from the injection-recovery test with $e_0 = 0.01$ injection for a GW170817-like event). 
+Moreover, Fig.~\ref{fig:correlation_gw170817} also displays distinct posterior distributions of the two waveform templates. Although the statistical uncertainty of $e_0$, indicated by the vertical width of (1, 2)-sigma contours in $e_0$ direction, exhibits a similar trend for both templates (i.e., increasing with increasing $m$), 
+\texttt{TaylorF2Ecck} shows subtle differences from \texttt{TaylorF2Ecc} in the posterior distributions, as shown by the spread of (1, 2)-sigma contours, and this difference becomes more pronounced with increasing $m$. A similar behavior, where \texttt{TaylorF2Ecck} deviates from \texttt{TaylorF2Ecc} with increasing $m$, was observed in the match-test in $e_0$--$m$ parameter space (see Fig.~\ref{fig:contour_mismatch} of Sec.~\ref{sec:sanity_check}). However, given the negligible eccentricity constrained for this event, we don't expect significant differences in the posterior distributions of the two waveforms due to the inclusion of extra harmonics and periastron advance effects. This expectation is supported by the injection-recovery test in Sec.~\ref{sec:sanity_check}, which shows that \texttt{TaylorF2Ecck} becomes significantly distinguishable (with $\Delta{\rm log}_{10}{\rm BF}>2$) from \texttt{TaylorF2Ecc} only at $e_0 > 0.06$.
+
+Finally, the posterior distribution of the luminosity distance ($D_L$) relative to the inclination angle ($\theta_{jn}$) shows remarkable similarity between \texttt{TaylorF2ecck} and \texttt{TaylorF2Ecc}, with $\% \Delta \mathrm{Median}$ values less than 2\% and ${\cal O}_{\rm CI}^{90\%}$ values above 99\%. 
+Unlike the mass parameters, no significant correlation appears between $D_L$ and $e_0$, or $\theta_{jn}$ and $e_0$. Extended parameter posteriors are provided in Fig.~\ref{fig:GW170817_full_pe} in the Appendix~\ref{sec:full_gw170817} for justifying 
+these inferences.
+%for further reference. 
+
+A similar analysis of GW190425 reinforces the conclusions drawn from GW170817, although with greater uncertainty due to its lower SNR and lack of an electromagnetic counterpart. This leads to weaker constraints on the mass ratio and the eccentricity. While the inclusion of 3.5PN phasing in \texttt{TaylorF2Ecc} still induces a shift in the mass ratio, this effect is less pronounced than in GW170817. However, similar to GW170817, 3.5PN phasing in \texttt{TaylorF2Ecc} has a negligible impact on the $e_0$ constraint. The full parameter posteriors are shown in Fig.~\ref{fig:GW190425_full_pe} in the Appendix~\ref{sec:full_GW190425} for additional reference.
+
+  For GW190425, \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} favor median $e_0$ values $< 0.011$ with its distribution extend to higher values. 
+  Using a uniform (log-uniform) prior on $e_0$, the 90\% credible intervals are $e_0 < 0.027$ ($e_0 < 0.016$) for \texttt{TaylorF2Ecck} and $e_0 < 0.025$ ($e_0 < 0.018$) for \texttt{TaylorF2Ecc} (see Table~\ref{tab:e0_waveform_comparison} and Fig.~\ref{fig:GW190425_full_pe} for more details on the parameter estimation results).
+ This event can be considered to have negligible eccentricity, as $e_0$ is lower than the 0.028 threshold identified through injection-recovery tests (see Fig.~\ref{fig:injection_recovery_appendix_GW190425} in Appendix~\ref{sec:appendix_injection_recovery}).
+  Similar to GW170817, the posterior distributions in the mass-eccentricity space (see $m$--$e_0$ and $\eta$--$e_0$ posterior contours in Fig.~\ref{fig:injection_recovery_appendix_GW190425}) show no significant difference between \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} due to this negligible eccentricity.
+  Moreover, prior work in LNB, using full-\texttt{TaylorF2Ecc}, reports 90\% credible interval with $e_0 \leq 0.048$ at 10 Hz using a uniform prior on $e_0$, and their data shows $e_0 = 0.013^{+0.012}_{-0.012}$ ($e_0 = 0.00022^{+0.01601}_{-0.00022}$) at 20 Hz using a uniform (log-uniform) prior of $e_0$, consistent with our result in terms of the 90\% credible interval. 
+  Contrary to their claim, the choice of prior (uniform versus logarithmic) doesn't significantly affect the $e_0$ posterior distribution, and consequently, does not alter our conclusion that eccentricity is negligible for both events.
+  Furthermore, in our results, the Bayes factor difference between \texttt{TaylorF2ecck} and \texttt{TaylorF2Ecc} remains below 1, indicating no strong preference for one model over the other. 
+  The values of $e_0$ at 20 Hz and corresponding $\Delta{\rm log}_{10}{\rm BF}$ for the \texttt{TaylorF2ecck} and \texttt{TaylorF2Ecc} for the two inspiral events are listed in Table~\ref{tab:waveform_comparison}.
+\begingroup
+%\setlength{\tabcolsep}{10pt} % Default value: 6pt
+\renewcommand{\arraystretch}{1.5} % Default value: 1
+\begin{center}
+\begin{table}[ht!]
+\begin{tabular}{lllcc}
+\hline\hline
+Event     & $e_0$ Prior       & Model & $e_0$ Value& $\Delta{\rm log}_{10}{\rm BF}$  \\
+\hline
+GW170817  & Uniform     & \texttt{Ecck}  & $0.003^{+0.006}_{-0.002}$ & 368.41      \\
+          &             & \texttt{Ecc}   & $0.002^{+0.003}_{-0.002}$ & 368.43              \\
+          & Log-Uniform & \texttt{Ecck}  & $0.002^{+0.004}_{-0.001}$ & 369.23     \\
+          &             & \texttt{Ecc}   & $0.002^{+0.002}_{-0.001}$ & 369.26              \\
+\hline
+GW190425  & Uniform     & \texttt{Ecck}  & $0.009^{+0.018}_{-0.008}$ & 17.70      \\
+          &             & \texttt{Ecc}   & $0.009^{+0.016}_{-0.009}$ & 17.76              \\
+          & Log-Uniform & \texttt{Ecck}  & $0.004^{+0.012}_{-0.002}$ & 18.18     \\
+          &             & \texttt{Ecc}   & $0.004^{+0.014}_{-0.003}$ & 18.24              \\
+\hline\hline
+\end{tabular}
+\caption{Parameter estimation result comparison of \texttt{TaylorEcck} (\texttt{Ecck}) and \texttt{TaylorEcck} (\texttt{Ecc}) waveforms for GW170817 and GW190425. It shows the values of medians and 90\% credible intervals of $e_0$. Corresponding $\Delta{\rm log}_{10}{\rm BF}$ values are also included.}
+\label{tab:waveform_comparison}
+\end{table}
+\end{center}
+\endgroup
+To further explore the observed mass ratio bias between the 3PN and the 3.5PN waveforms, we conducted additional checks using the circular \texttt{TaylorF2} approximant with PN phasing terms. This extension seeks to clarify how higher PN corrections influence the precision and reliability of parameter estimation in eccentric binary coalescences, offering a pathway to refine our understanding of these subtle yet critical effects.
+
+\subsection{Probing PN order  dependence of ${\cal M}$  and $q$ posteriors for GW170817}\label{sec:tf2_analysis}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=8.52cm]{figs/GW170817_TF2.pdf}
+    \caption{
+    %GW170817 parameter estimation test with increasing PN orders. 
+     % ${\cal M}$ and $q$ corner plots for GW170817 while employing circular
+     % \texttt{TaylorF2} approximant with Fourier phases that are accurate to 3PN, 3.5PN, 4PN and 4.5PN orders.
+     % These posteriors essentially converge, with 90\% credible interval taken into consideration,  after 3PN order and a natural implication  of 
+     % these parameter estimation studies is that inspiral approximants should be at least 3.5PN accurate 
+     % in their GW phase evolution.
+     Chirp mass ${\cal M}$ and mass ratio $q$ posteriors for GW170817 derived from the circular \texttt{TaylorF2} approximant (TF2) with varying PN order accuracy (3PN, 3.5PN, 4PN and 4.5PN) in the Fourier phase.
+     Despite some residual uncertainties inherent in parameter estimation, these posteriors largely converge beyond 3PN, considering the median values and the 90\% credible intervals.
+     The natural implication  of these parameter estimation studies is that such inspiral approximants, including the \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc}, should be at least 3.5PN accurate in their GW phase evolution to get a reliable posterior.
+    } \label{fig:TF2GW170817}
+\end{figure}
+
+The observed dependence of median $q$ values on PN order up to which Fourier phase contributions are included, as evident from Fig.~\ref{fig:pe_comparison}, prompted us to explore if such $q$ dependence exists for pure circular inspiral template families. In other words, does the quasi-circular \texttt{TaylorF2} approximant provide posteriors for GW170817 that depend on the PN accuracy of its Fourier phase contributions?
+
+The \texttt{TaylorF2} approximant is typically used with 3.5PN accurate Fourier phase contributions, as done in the Ref.~\cite{BIOPS}. This approximant can be extended such that its Fourier phase is accurate to 4.5PN order~\cite{B45PN_23}. This extension is primarily due to a highly detailed and demanding effort that extended 
+GW generation to 4.5PN order by employing the Multipolar-Post-Minkowskian approach (see Ref.~\cite{blanchet2024, B45PN_23}
+%see Ref.~\cite{BFT24} 
+and references therein). More importantly, the relevant Fourier coefficients at all PN orders up to 4.5PN were provided in \cite{B45PN_23}. Using these inputs, we extended the widely used \texttt{TaylorF2} approximant in LALSuite for parameter estimation to 4.5PN order, allowing us to use the template family with Fourier coefficients limited to 3PN, 3.5PN, 4PN, or 4.5PN order, which I will refer to as TF2-3PN, TF2-3.5PN, TF2-4PN, and TF2-4.5PN, respectively.
+
+% The \texttt{TaylorF2} approximant is typically used with 3.5PN accurate Fourier phase contributions as done in \cite{BIOPS}.
+% Fortunately, this approximant can be extended such that 
+% its Fourier phase is accurate to 4.5PN order \cite{B45PN_23}.
+% This extension is mainly due to a highly detailed and demanding effort that extended 
+% GW generation to 4.5PN order by employing the 
+% Multipolar-Post-Minkowskian approach (see \cite{BFT24} and references therein).
+% % https://arxiv.org/abs/2407.18295
+% More importantly, the relevant Fourier coefficients that appear at 
+% all PN orders up to 4.5PN were provided in \cite{B45PN_23}.
+%  With these inputs, we extended the widely used \texttt{TaylorF2} approximant to 4.5PN order, allowing us to invoke the template family while restricting its Fourier coefficient to 3PN, 3.5PN, 4PN or 4.5PN order.
+The results of our parameter estimation studies for the extended \texttt{TaylorF2} approximant are shown in Fig.~\ref{fig:TF2GW170817}. Here, we set the sampling frequency to 2048 Hz with $f_{\rm max}$ of 512 Hz. Increasing these values should not alter our main conclusions. From Fig.~\ref{fig:TF2GW170817}, it is clear that the median values for both ${\cal M}$ and $q$ for TF2-3PN differ substantially from their counterparts at other PN order accuracies. 
+%For ${\cal M}$, the overlap of posteriors between TF2-3PN and the others is moderately low, with ${\cal O}_{\rm CI}^{90\%}\lesssim36\%$, while the overlaps among TF2-3.5PN, TF2-4PN, and TF2-4.5PN are considerably higher, with ${\cal O}_{\rm CI}^{90\%}\gtrsim$88\%. 
+Regarding $q$ posterior distributions, the overlap between TF2-3PN and the other approximants is essentially zero, whereas the overlaps among TF2-3.5PN, TF2-4PN, and TF2-4.5PN are relatively high, with ${\cal O}_{\rm CI}^{90\%}\gtrsim$74\%.
+In fact, ${\cal M}$ and $q$ posteriors are relatively independent of PN orders from 3.5PN onwards.
+This is reassuring as our results indicate that the widely quoted ${\cal M}$ and $q$  posteriors for GW170817~\cite{GW170817pe} are indeed correct.
+%, though it leads to broader posteriors for $m_1$ and $m_2$ in higher parameter space 
+%as evident from Fig.~\ref{fig:pe_context} and in Ref.~\cite{LVK_GW170817}.
+
+A natural corollary of these parameter estimation studies is that it is desirable  to extend the work of~\cite{Arun09}, which computed the angular momentum flux for eccentric binaries at 3PN order, to 3.5PN accuracy. 
+This will involve computing 3.5PN accurate mass and current quadrupole moments that are critical to obtain 3.5PN accurate energy and angular momentum fluxes that involve mainly hereditary contractions~\cite{Arun09,LB_LR}.
+After that, it should be straightforward  to obtain $e_t(x,x_0,e_0)$ and $\Psi (x, x_0, e_0) $ to 3.5PN order following the prescription detailed in \cite{TGHH}.
+Interestingly, this extension would not require inputs from the 4PN accurate Keplerian type parametric solution (for eccentric, non-spinning binaries) available in \cite{CTGL21}, or the 4.5PN phasing if it becomes available later, to achieve reliable posterior results in parameter estimation.
+%and recovering the correct parameters within a 90\% credible interval.
+%  The results of our parameter estimation studies for the extended \texttt{TaylorF2} approximant is shown in Fig.~\ref{fig:TF2GW170817}.
+% It should be obvious that the median values for both ${\cal M}$ and $q$ at 3PN order differs substantially  from the
+% their counterparts at other PN orders.
+% %In fact, ${\cal M}$ and $q$ posteriors are basically independent of PN orders from 3.5PN onwards.
+% In fact, ${\cal M}$ and $q$ posteriors are relative independent, under (error) 90% credible interval consideration, of PN orders from 3.5PN onwards.
+% This is reassuring as our results indicate that the widely quoted ${\cal M}$ and $q$  posteriors for GW170817 is indeed correct 
+% though it leads to broader posteriors for $m_1$ and $m_2$ (at higher parameter space)
+% % this means their posterior has more parameter than our Parameter estimation calculation
+% as evident from Fig.~ in \cite{LVK_GW170817}.
+% A natural corollary of these parameter estimation studies is that it is desirable  to extend what are done in \cite{Arun09} to 3.5PN order.
+% This involves computing 3.5PN accurate mass and current quadrupole moments that are critical to obtain 3.5PN accurate energy and angular momentum fluxes that involve mainly hereditary contractions\cite{Arun09,LB_LR}.
+% After that, it should be straightforward  to obtain $e_t(x,x_0,e_0)$ and $\Psi (x, x_0, e_0) $ to 3.5PN order following the prescription detailed in \cite{TGHH}.
+% Interestingly, we will not require any inputs from the 4PN accurate Keplerian type parametric solution (for eccentric, non-spinning, inspiral) available in \cite{CTGL21}; or 4.5PN phasing if available in the future. 
+% % https://arxiv.org/abs/2110.09608
+
+In our opinion, it will be critical to obtain \texttt{TaylorF2ecck} approximant  whose Fourier coefficients are accurate to 3.5PN order for data analysis purposes and while trying to obtain eccentric IMR template families that are required to search for eccentric GW events in the LVK data. Additionally, it will be interesting to explore the implications of missing 3.5PN order contributions to GW emissions in the time-domain eccentric IMR template families that are being constructed these days~\cite{Huerta2018}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ Conclusion }\label{sec:conclusion}
+
+% Purpose : Recap & Interpretation
+% Focus	: Significance & Implications
+% Scope	: Comprehensive Overview
+In this work, we introduced and tested \texttt{TaylorF2ecck}, a TaylorF2 family frequency-domain inspiral approximant implemented within the LALSuite framework. This model, influenced by Ref.~\cite{TGHH}, analytically describes gravitational waves from non-spinning compact binaries, incorporating eccentricity induced orbital, advance of periastron GW emission effects consistently to the 3PN order. Specifically, \texttt{TaylorF2ecck} incorporates ${\cal O}(e_0^2)$ contributions to the 3PN-accurate Fourier phases, while their amplitudes are at the quadrupolar order and with ${\cal O}(e_0)$ order accuracy.
+
+Following comprehensive sanity checks to validate the model's performance and investigate the influence of  periastron advance in the relevant parameter space, we employed \texttt{TaylorF2ecck} with the \texttt{Bilby} package to analyze public LVK data for the purely inspiral events GW170817 and GW190425.
+Our Bayesian parameter estimation indicates that the $e_0$ for both events is statistically consistent with zero at a 90\% confidence level (specifically, $e_0 < 0.011$ for GW170817 and $e_0 < 0.028$ for GW190425 at 20 Hz), under the assumptions of  uniform and log-uniform prior for $e_0$ and it corroborates previous studies by LNB.
+Given the negligible eccentricities measured for these events, our comparison between \texttt{TaylorF2ecck} and \texttt{TaylorF2ecc} showed subtle differences in the 2D mass-eccentricity posterior contours, but no significant differences in the constraints on individual parameters arising from the inclusion of multiple harmonics and the periastron advance effect in \texttt{TaylorF2ecck}. However, a substantial bias in the $q$ posterior was observed when comparing these models to a version of \texttt{TaylorF2ecc} that included 3.5PN-order circular contributions in its Fourier phase. Considering the known correlation between mass and eccentricity, these parameter estimation studies therefore suggest the importance of incorporating $e_0$ contributions at least up to 3.5PN-order in our eccentric waveform model. This inference regarding the $q$ bias and the significance of 3.5PN phasing was substantiated by employing versions of the quasi-circular \texttt{TaylorF2} approximant that incorporate Fourier phase contributions at various PN orders.
+
+% In this investigation, we have presented a comprehensive analysis aimed at constraining the initial orbital 
+% eccentricities of two pure inspiral events,
+% %namely GW170817 and GW190425, 
+% %In our analysis, we constrained initial orbital eccentricities of two pure inspiral events,
+%  namely GW170817 and GW190425, 
+%  while employing  public LVK data, a newly implemented 
+%  \texttt{TaylorF2ecck} eccentric inspiral approximant within the \texttt{LALSuite} framework,
+% and the \texttt{Bilby} Python package.
+% Our fully analytic frequency domain approximant incorporates eccentricity induced orbital, advance of
+% periastron GW emission effects consistently  to the 3PN order to model inspiral GWs from non-spinning compact binaries, influenced by Ref.~\cite{TGHH}.
+% % followoing lines will be remove if unecessary
+% Specifically, \texttt{TaylorF2ecck} incorporates ${\cal O}(e_0^2)$ contributions to the 3PN-accurate Fourier phases, while their amplitudes are at the quadrupolar order and with ${\cal O}(e_0)$ order accuracy.
+
+% Our findings, derived from rigorous parameter estimation studies employing Bayesian inference and nested sampling methodologies, indicate that the initial orbital eccentricities for GW170817 and GW190425 are statistically consistent with zero at a 90\% confidence level, under the assumptions of  uniform and log-uniform prior for $e_0$ and it corroborates previous studies by LNB.
+% %This result not only corroborates previous studies but also highlights the critical role of employing a 3.5PN accurate Fourier phase in gravitational wave analysis.
+% We demonstrated why it is important to incorporate $e_0$ contributions that appear at 3.5PN order in to various Fourier phases of our approximant using PN extensions of the widely used quasi-circular \texttt{TaylorF2} approximant.
+
+%A direct comparison with LNB ..mention their approximant etc..
+%{\bf  We need to comment on the results Romero-Shaw et al. (2020) \&   https://arxiv.org/pdf/2005.14146 }
+%These findings have implications for understanding the formation channels of these events. For GW190425, which is significantly more massive than Galactic double neutron stars (unlike the lower-mass GW170817), other studies have explored its formation. 
+A direct comparison can be made between LNB's result using full-\texttt{TaylorF2Ecc} and our result using \texttt{TaylorF2Ecck} regarding the constraints on $e_0$ for the GW190425 event. To give additional context to LNB's result, it is important to note the comparison with Ref.~\cite{Romero_Shaw_2020_GW190521}, which concerns the formation channel of GW190425. 
+%This event is of interest because it is more massive than typical Galactic double neutron stars (unlike the lower-mass GW170817).
+Specifically, Ref.~\cite{Romero_Shaw_2020_GW190521} probes GW190425 for residual eccentricity at 10 Hz, to explore a formation channel influence by unstable BB mass transfer. Their result, with $e_0\leq 0.007$, show no evidence for or against it. LNB reiterates this, reporting $e_0\leq 0.023$ at 10 Hz, and states that this larger $e_0$ value doesn't alter the conclusion of Ref.~\cite{Romero_Shaw_2020_GW190521}. Our result is consistent with LNB with $e_0\leq0.018$ (at 20 Hz) using log-uniform prior; additionally noting that we cannot distinguish eccentric waveforms from quasi-circular waveforms at low eccentricities.
+
+Our results indicate that GW170817 and GW190425 show no evidence of dynamical formation due to their negligible $e_0$ values at 20 Hz, which is consistent with the binaries having formed in the field.
+This is supported by several reasons from prior studies: firstly, typical LVK binaries are expected to have circularized to $e_0 \leq 10^{-4}$ by the time they reach the LIGO-Virgo band~\cite{Peters64, Kowalska11}; secondly, only a small proportion (between 0.2\% and 2\%) of NS binaries will have eccentricity above 0.1 for the Advanced LIGO/Virgo~\cite{Peters64}; and thirdly, the estimated merger rate of eccentric NS binaries formed via dynamical interactions in globular clusters is low ($\sim 0.02 {\rm Gpc}^{-3}{\rm Yr}^{-1}$)~\cite{Ye2019}.
+However, it should be interesting to pursue an effort to 
+%given that \texttt{TaylorF2Ecck} is a restricted waveform, more definitive insights could be achieved by re-evaluating the parameter estimation for GW170817 
+ constrain GW170817's $e_0$ value  at 10 Hz using an improved version of \texttt{TaylorF2Ecck} 
+ while employing more 
+ efficient data analysis techniques (e.g., relative binning~\cite{zackay2018}). In contrast, such analyses will be more challenging for GW190425 due to its low network SNR, and this is reflected in the higher uncertainty in its $e_0$ estimates.
+ %in our and Ref.~\cite{LNB}'s results. 
+% For the moment, our results with negligible eccentricity are consistent with the binaries being formed in the field. This is supported by several reasons: firstly, typical LVK binaries are expected to have circularized to $e_0 \leq 10^{-4}$ by the time they reach the LIGO-Virgo band~\cite{Peters64, Kowalska11}; secondly, only a small proportion (between 0.2\% and 2\%) of NS binaries will have eccentricity above 0.1 for the Advanced LIGO/Virgo~\cite{Peters64}; and thirdly, the estimated merger rate of eccentric NS binaries formed via dynamical interactions in globular clusters is low ($\sim 0.02 {\rm Gpc}^{-3}{\rm Yr}^{-1}$)~\cite{Ye2019}.
+% For the moment, our results with negligible eccentricity, are consistent with the binaries being formed in the field, reasons
+% 1) as such systems are expected  to have circularized to 
+% $e_0 \leq 10^{-4}$ by the time they reach the LIGO-Virgo band~\cite{Peters64, Kowalska11}.
+% 2) given the low fraction between 0.2\% and 2\%  NS binaries with eccentricity above 0.1 (Advance LIGO/VIRGO)~\cite{Peters64, Kowalska11}
+% 3) and given the low merger rate estimates of eccentric binaries~\cite{}.
+
+%Consequently, the present effort should be extended in the following directions.
+There are many directions to extend the present effort. 
+It will be interesting  to include higher order 
+$e_0$ contributions both in Fourier phases and amplitudes of various harmonics,
+many of these contributions  are available in Ref.~\cite{TGHH}, 
+and explore their data analysis implications for both ground and space-based GW observatories~\cite{Paul2023, BBG23}.
+%{\bf list few DA papers }
+Another direction should be to explore steps to create an efficient 
+template bank for the detection of such binaries, influenced by Ref.~\cite{Phukon2025}.
+%https://ui.adsabs.harvard.edu/abs/2024arXiv241206433P/abstract
+It should be worthwhile to 
+incorporate spin effects into our approximant and many required inputs 
+exist in Ref.~\cite{Henry2023,sridhar2024}.
+% https://ui.adsabs.harvard.edu/abs/2023PhRvD.108j4016H/abstract
+% https://ui.adsabs.harvard.edu/abs/2024arXiv241210909S/abstract
+It will be desirable to add merger and ring-down effects into our pure inspiral templates by stitching 
+our approximant with inputs from Numerical Relativity, as listed for example in Ref.~\cite{ficarra2025}.
+% https://ui.adsabs.harvard.edu/abs/2025PhRvD.111d4015F/abstract
+Detailed parameter studies, relevant for both ground and space-based GW observatories should be another direction of our inspiral templates, influenced by Ref.~\cite{Paul2023, BBG23}.
+%{\bf we need many references  3B and 3C needs a bit more juice}
+However, all these efforts  should employ  \texttt{TaylorF2Ecck} approximant 
+incorporates $e_0$ contributions appearing at 3.5PN order and this requires extending the detailed 3PN computations, detailed in Refs.~\cite{Arun09}, to 3.5PN order.
+
+During the finalization of this manuscript, the \texttt{pyEFPE} waveform model became available~\cite{Morras2025a}, a new Python implementation of the long-developing EFPE framework~\cite{Klein2010, Klein_2018, Klein2021} for modeling inspiraling compact binaries with eccentricity and spin-precession, which now also incorporates the effects of periastron advance.
+This model was recently used for parameter estimation of the GW200105 event (an NS-BH binary analyzed as a purely inspiral event by limiting $f_{\rm max}$ to 280~Hz), claiming evidence of periastron advance and reporting eccentricity of $e_0 = 0.145^{+0.007}_{-0.097}$ at 20~Hz\cite{Morras2025b}. Although our current study with \texttt{TaylorF2Ecck} primarily focuses on pure inspiral NS-NS events with generally low residual eccentricity ($\lesssim 0.1$), we performed a parameter estimation run on same event for comparison. A direct, one-to-one comparison between \texttt{TaylorF2Ecck} and \texttt{pyEFPE} is challenging due to differing methodologies to get GW waveform reponse function.
+\texttt{TaylorF2Ecck}, following Ref.~\cite{TGHH}, analytically implements eccentricity-induced orbital effects, including periastron advance and GW emission, and converts these to the frequency domain using SPA with fully analytic PN terms. In contrast, the \texttt{pyEFPE} model, as described in\cite{Morras2025a}, incorporates eccentricity and periastron advance in a manner that does not allow for full analyticity in its frequency-domain eccentric part, due to numerical integration and other non-analytic approximations in handling eccentricity evolution. 
+A preliminary mismatch comparison (Appendix~\ref{sec:comparison_pyefpe_taylorf2_family}) shows that \texttt{pyEFPE} diverges significantly from the \texttt{TaylorF2} family for $e_0 \gtrsim 0.08$. This is likely due to \texttt{TaylorF2Ecc}/\texttt{TaylorF2Ecck} being limited to leading-order ${\cal O}(e_0^2)$ phasing corrections, whereas \texttt{pyEFPE} incorporates up-to ${\cal O}(e_0^4)$ terms, which are important for long inspirals and moderate $e_0$ (also see Ref.~\cite{TGHH} for a comparison of ${\cal O}(e_0^2)$ and ${\cal O}(e_0^6)$ corrections in eccentric inspirals). Future updates to \texttt{TaylorF2Ecck} will enable direct tests of these higher-order corrections.
+% A preliminary mismatch percentage comparison, included in Appendix~\ref{sec:comparison_pyefpe_taylorf2_family}, between \texttt{pyEFPE}, \texttt{TaylorF2Ecck}, and \texttt{TaylorF2Ecc} suggests that \texttt{pyEFPE} does not closely align with \texttt{TaylorF2} family waveforms, and diverge significantly at $e_0\gtrsim0.08$ when compared to \texttt{TaylorF2Ecc}.
+% Some of the discrepancy is likely because the implementation, in \texttt{TaylorF2Ecc}/\texttt{TaylorF2Ecck}, is restricted to leading-order O($e_0^2$) corrections in the phasing, while \texttt{pyEFPE} includes O($e_0^4$) terms, which can become important for long inspirals and moderate eccentricities (which will be tested in the future with an updated /\texttt{TaylorF2Ecck})
+
+For the GW200105 event, using the same parameter estimation settings as in Ref.~\cite{Morras2025b}, our \texttt{TaylorF2Ecck} analysis yielded $e_0 = 0.122^{+0.027}_{-0.098}$ at 20~Hz, and an analysis with \texttt{TaylorF2Ecc} resulted in $e_0 = 0.122^{+0.028}_{-0.096}$. These results are consistent with those reported in\cite{Morras2025b} within the 90\% credible intervals. Furthermore, parameter estimation runs using the circular \texttt{TaylorF2} approximant with both 3PN and 3.5PN phasing corrections were conducted. The Bayes factor comparison yielded $\Delta \log_{10} \mathrm{BF} < 1$ when comparing \texttt{TaylorF2Ecck} to both \texttt{TaylorF2Ecc} and \texttt{TaylorF2} for this NS-BH event. Consequently, while our eccentricity estimates align, we cannot definitively claim the presence of periastron advance or eccentricity for this event with \texttt{TaylorF2Ecck} due to the lack of strong Bayesian evidence. This nevertheless suggests that such systems are promising candidates for future investigations, particularly with an improved version of \texttt{TaylorF2Ecc} approximant.
+
+\section{Data Availability}\label{DataAvailability}
+
+This article's data, code, and plot generation Jupyter-lab-notebook are accessible in the associated data release on GitHub~\cite{TaylorF2EcckRepo}. The version of LALSuite that includes \texttt{TaylorF2Ecck}, \texttt{TaylorF2Ecch}, and the extended PN-order \texttt{TaylorF2} is available in a forked GitLab repository~\cite{lalsuitehemanta2022} from the original repository~\cite{lalsuite}.
+
+For GW170817 and GW190425, we employ publicly available gravitational-wave strain data from the Advanced LIGO and Virgo detectors, accessed through the LIGO Open Science Center (LOSC)~\cite{Vallisneri_2015}. For GW170817, we utilize the LOSC\_CLN\_4\_V1 data set, which includes noise subtraction performed by the collaboration~\cite{Blackburn2017_LOSC_CLN, Driggers2019}; additional details on the data release can be found in Ref.~\cite{GWOSC2017_GW170817}. For GW190425, we use the T1700406\_v3 data set, which features pre-processed glitch removal optimized for parameter estimation~\cite{Abbott2020b_GW190425Glitch, Abbott2020GW190425}; see also Ref.~\cite{LIGO2019_GW190425_data} for further information on the data release.
+
+
+\section{Acknowledgements}\label{acknowledgements}
+
+It is a pleasure to thank Otto A. Hannuksela for his suggestions and useful discussions on the parameter estimation results. We also thank Chunglee Kim for providing further information on the \texttt{TaylorF2Ecc} waveform approximant.
+
+The computational work for this manuscript was carried out using computational resources provided by the LIGO Data Grid (LDG) cluster at the California Institute of Technology (CIT) (California, USA) and the Inter-University Centre for Astronomy and Astrophysics (IUCAA) (Pune, India), also known as Sarathi. We utilized the following Python softwares: \texttt{bilby\_pipe}~\cite{bilby_pipe_paper} for parameter estimation, \texttt{pycbc}~\cite{pycbc} for match-test, and \texttt{lalsuite}~\cite{lalsuite} for waveform generation.
+
+P.H. gratefully acknowledges the support of the Department of Physics at The Chinese University of Hong Kong through the Postgraduate Studentship that made this research possible. A.G. acknowledges the support of the Department of Atomic Energy, Government of India, under project identification \#RTI 4002. The authors gratefully acknowledge the computational resources and data provided by the LIGO Laboratory and supported by National Science Foundation Grant Nos. PHY-0757058 and PHY-0823459. 
+This research has made use of data or software obtained from the Gravitational Wave Open Science Center (gwosc.org), a service of the LIGO Scientific Collaboration, the Virgo Collaboration, and KAGRA.
+This material is based upon work supported by NSF’s LIGO Laboratory which is a major facility fully funded by the National Science Foundation, as well as the Science and Technology Facilities Council (STFC) of the United Kingdom, the Max-Planck-Society (MPS), and the State of Niedersachsen/Germany for support of the construction of Advanced LIGO and construction and operation of the GEO600 detector. Additional support for Advanced LIGO was provided by the Australian Research Council. Virgo is funded, through the European Gravitational Observatory (EGO), by the French Centre National de Recherche Scientifique (CNRS), the Italian Istituto Nazionale di Fisica Nucleare (INFN) and the Dutch Nikhef, with contributions by institutions from Belgium, Germany, Greece, Hungary, Ireland, Japan, Monaco, Poland, Portugal, Spain. KAGRA is supported by Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan Society for the Promotion of Science (JSPS) in Japan; National Research Foundation (NRF) and Ministry of Science and ICT (MSIT) in Korea; Academia Sinica (AS) and National Science and Technology Council (NSTC) in Taiwan. Virgo is funded, through the European Gravitational Observatory (EGO), by the French Centre National de Recherche Scien- tifique (CNRS), the Italian Istituto Nazionale di Fisica Nu- cleare (INFN) and the Dutch Nikhef, with contributions by institutions from Belgium, Germany, Greece, Hungary, Ireland, Japan, Monaco, Poland, Portugal, Spain. KAGRA is supported by Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan Society for the Promotion of Science (JSPS) in Japan; National Research Foundation (NRF) and Ministry of Science and ICT (MSIT) in Korea; Academia Sinica (AS) and National Science and Technology Council (NSTC) in Taiwan.
+%  We thank .....{\bf left for additional acknowledgements}\\
+%  PH thank his supervisor Otto A. Hannuksela suggestions and illuminating discussions. PH also thanks Chunglee Kim for giving more information on \texttt{TaylorF2Ecc} waveform approximant.
+% PH acknowledges the Department of Physics at The Chinese University of Hong Kong for the Postgraduate Studentship that made this research
+% possible.
+% AG acknowledges the support of the Department of Atomic
+% Energy, Government of India, under project identification \#RTI 4002.
+% The authors gratefully acknowledge the computational resources and data provided by the LIGO Laboratory and supported by National Science Foundation Grant Nos. PHY-0757058 and PHY-0823459. We also acknowledge that the computational work in this research was also conducted using the IUCAA LDG cluster, Sarathi.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\renewcommand{\theequation}{A\arabic{equation}} % Redefine equation numbering
+%\setcounter{equation}{0} % Reset equation counter
+
+\section{Detailed Analytical Structure of the \texttt{TaylorF2Ecck} Waveform Approximant} \label{sec: TaylorF2Ecck_full}
+
+The following subsections provide a comprehensive description of the analytical formulation of the \texttt{TaylorF2Ecck} waveform model. This includes the detailed mathematical expressions for the frequency-domain gravitational waveform $\tilde{h}(f)$, the associated Fourier phase $\psi_{j,n}$ for each harmonic ($j,n$), the periastron advance parameter $k$, and the formula for the evolution of orbital eccentricity $e_t$ (following inputs from~\cite{TGHH}).
+% In the following subsections, we will include a detailed analytical structure of TaylorF2Ecck. It includes explicit expressions for $\tilde{h}(f)$, $\psi_{j,n}$, $k$ and $e_t$ (eccentricity evolution~\cite{TGHH}).
+% %and expressions eccentricity evolution $e_t$.
+
+\subsection{The 3PN Accurate Analytical Expression for the Frequency-Domain Waveform $\tilde{h}(f)$} \label{sec: TaylorF2Ecck hf}
+
+Below, we present the explicit of $\tilde{h}(f)$ with it's 3PN accurate $\psi_{j,n}$ with eccentricity correction of ${\cal O}(e_0^2)$ order, and quadrupolar amplitude with eccentricity correction of ${\cal O}(e_0)$ order. The expression reads
+\begin{subequations}
+\begin{align}
+\tilde{h}(f) = & \, \left( \frac{5\pi \eta}{384} \right)^{1/2} \frac{(G m)^2}{c^5 {\cal D}} \left(\frac{Gm\pi f}{c^3}\right)^{-7/6} \notag \\
+&\times \sum_{j,n} \xi_{j,n} \left(\frac{j}{2}\right)^{2/3} e^{-i(\Psi_{j,n}-\pi/4)} \Theta_{j,n}\,,
+\end{align}
+with 
+\begin{align}
+\Theta_{j,n} = & \, \text{Heaviside}\left[ \left(j-(j+n)\frac{k}{1+k} \right)f_{\text{ISCO}}-2f \right]\,, \notag \\
+=&\, 
+    \begin{cases}
+        1 & \text{if } \left(j-(j+n)\frac{k}{1+k} \right)f_{\text{LSO}} > 2f\,,\\
+        0 & \text{if } \left(j-(j+n)\frac{k}{1+k} \right)f_{\text{LSO}} \leq 2f\,,
+    \end{cases}
+\end{align}
+\end{subequations}
+where $f_{\rm LSO}$ is the last stable circular orbit, and it reads
+\begin{align}
+    f_{\rm LSO} = &\, \frac{c^3}{G m \pi 6^{3/2}}\,. \label{eq:flso}
+\end{align}
+
+\subsection{Explicit 3PN Order Expression for the Fourier Phase $\psi_{j,n}$} \label{sec: TaylorF2Ecck psi}
+
+The analytical form of 3PN-order Fourier phase of each (j,n) harmonic, $\psi_{j,n}$, is presented here. This phase is accurate to the 3PN order and includes terms that account for orbital eccentricity up to the order of ${\cal O}(e_0^2)$ contributions. The expression for $\psi_{j,n}$ reads
+\begin{subequations}
+\label{eq:Ecck_psi_full}
+\begin{align}
+\psi_{j,n} =& \, -2 \pi  f t_c+\phi_c \left(j-(j+n)\frac{k}{1+k} \right) \notag \\
+& - \frac{3 j}{256 \eta  x_{j,n}^{5/2}} \sum _{u=0}^6 {\cal D}_u\,x_{j,n}^{u/2}\,,\label{eq:Ecck_psi_full_}
+\end{align}
+with
+\begin{align}
+x_{j,n} =& \, \left[ \frac{2 \pi G m f}{\left\{j - \frac{(j+n)k}{1+k}\right\}c^3} \right]^{2/3}\,, 
+\end{align}
+\end{subequations}
+where the PN coefficients ${\cal D}_u$ in the above expression read
+\begin{widetext}
+\begin{subequations}
+\begin{align}
+% 0
+{\cal D}_0=& \, 1- e_0^2 \left\{ \frac{2355}{1462} \chi^{-19/9}\right\}\,, \\
+% 1
+{\cal D}_1=& \, 0\,, \\
+% 2
+{\cal D}_2=& \, \frac{55 \eta }{9}-\frac{25 n}{3 j}-\frac{2585}{756} + e_0^2 \left\{\left(-\frac{128365 \eta }{12432}+\frac{1805 n}{172 j}+\frac{69114725}{14968128}\right) \chi^{-19/9} + \left(\frac{154645 \eta }{17544}-\frac{2223905}{491232}\right) \chi^{-25/9} \right\}\,, \\ 
+% 3
+{\cal D}_3=& \, -16 \pi + e_0^2 \Bigg\{\frac{65561 \pi }{4080}\chi ^{-19/9}-\frac{295945 \pi }{35088}\chi ^{-28/9}\Bigg\}\,, \\
+% 4
+{\cal D}_4=& \, \frac{3085 \eta ^2}{72}+\eta  \left(\frac{22105}{504}-\frac{10 n}{j}\right)-\frac{31805 n}{252 j}-\frac{48825515}{508032} \notag \\
+& +e_0^2 \left\{\left(-\frac{10688155 \eta ^2}{294624} + \eta  \left(\frac{36539875 n}{1260072 j}-\frac{72324815665}{6562454976}\right)+\frac{323580365 n}{5040288 j}+\frac{115250777195}{2045440512}\right)\chi ^{-19/9} \right. \notag \\
+&\left. + \left(\frac{25287905 \eta ^2}{447552}+\eta  \left(-\frac{355585 n}{6192 j}-\frac{3656612095}{67356576}\right)+\frac{5113565 n}{173376 j}+\frac{195802015925}{15087873024}\right)\chi ^{-25/9} \right. \notag \\ 
+&\left. + \left(-\frac{14251675 \eta ^2}{631584}+\frac{3062285 \eta }{260064}+\frac{936702035}{1485485568}\right)\chi ^{-31/9} \right\}\,, \\
+% 5
+ {\cal D}_5=& \, -\left(\frac{65 \pi \eta }{9}+\frac{160 \pi n}{3 j}+\frac{1675 \pi }{756}\right) \left(\log \left(\frac{f}{f_\text{LSO}}\right)-\log (j)\right)-\frac{1}{9} (65 \pi ) \eta -\frac{32 \pi n}{j}+\frac{14453 \pi }{756} \notag \\
+ & + e_0^2 \left\{ \left(\frac{15803101 \pi \eta }{229824}-\frac{4909969 \pi n}{46512 j}-\frac{458370775 \pi }{6837264}\right) \chi^{-19/9} \right. \notag \\
+ & + \left(-\frac{48393605 \pi \eta }{895104}+\frac{680485 \pi n}{12384 j}+\frac{26056251325 \pi }{1077705216}\right) \chi^{-28/9} \notag \\
+ & \left. + \left(\frac{185734313 \pi }{4112640}-\frac{12915517 \pi \eta }{146880}\right) \chi^{-25/9} + \left(\frac{149064749 \pi \eta }{2210544}-\frac{7063901 \pi }{520128}\right) \chi^{-34/9} \right\}\,,  \\ 
+% 6
+{\cal D}_6=& -\frac{6848 \gamma }{21}-\frac{127825 \eta ^3}{1296}+\eta ^2 \left(\frac{475 n}{24 j}+\frac{110255}{1728}\right) \notag \\
+& + \eta  \left(\frac{1845 \pi ^2 n}{32 j}-\frac{2393105 n}{1512 j}+\frac{23575 \pi ^2}{96}-\frac{20562265315}{3048192}\right)+\frac{257982425 n}{508032 j}-\frac{3424 \log (x)}{21}-\frac{640 \pi ^2}{3} \notag \\
+& +\frac{13966988843531}{4694215680}-\frac{13696 \log (2)}{21} + e_0^2 \left\{ \left(\frac{2105566535 \eta ^3}{10606464}+\eta ^2 \left(-\frac{7198355375 n}{45362592 j}-\frac{2186530635995}{52499639808}\right) \right. \right. \notag \\
+&\left. +\eta  \left(-\frac{9519440485 n}{35282016 j}-\frac{13467050491570355}{39689727694848}\right)+\frac{916703174045 n}{5080610304 j}+\frac{326505451793435}{2061804036096}\right) \chi^{-25/9} \notag \\
+& + \left(-\frac{2330466575 \eta ^3}{16111872}+\eta ^2 \left(\frac{32769775 n}{222912 j}+\frac{906325428545}{6466231296}\right) \right. \notag \\
+&\left. +\eta  \left(-\frac{119702185 n}{1560384 j}-\frac{48415393035455}{1629490286592}\right)-\frac{2153818055 n}{524289024 j}-\frac{82471214720975}{45625728024576}\right) \chi^{-31/9} \notag \\
+& + \left(-\frac{734341 \gamma }{16800}-\frac{69237581 \eta ^3}{746496}+\eta ^2 \left(\frac{43766986495 n}{1022720256 j}-\frac{159596464273381}{1718170030080}\right) \right. \notag \\
+& +\eta  \left(\frac{639805 \pi ^2 n}{22016 j}-\frac{1219797059185 n}{2045440512 j}+\frac{12111605 \pi ^2}{264192}-\frac{37399145056383727}{28865256505344}\right)+\frac{534109712725265 n}{2405438042112 j} \notag \\
+&\left. -\frac{734341 \log (x)}{33600}-\frac{21508213 \pi ^2}{276480}+\frac{4175723876720788380517}{5556561877278720000}+\frac{4602177 \log (3)}{44800}-\frac{9663919 \log (2)}{50400}\right) \chi^{-19/9} \notag \\
+& +\frac{24716497 \pi ^2}{293760}\chi^{-28/9} + \left(\frac{2603845 \gamma }{61404}+\frac{2425890995 \eta ^3}{68211072}+\frac{4499991305 \eta ^2}{636636672} \right. \notag \\
+& +\left(\frac{3121945 \pi ^2}{561408}-\frac{1437364085977}{53477480448}\right) \eta -\frac{2603845 \log (\chi )}{184212}+\frac{2603845 \log (x)}{122808}-\frac{96423905 \pi ^2}{5052672}-\frac{4165508390854487}{16471063977984} \notag \\
+&\left. \left. +\frac{1898287 \log (2)}{184212}+\frac{12246471 \log (3)}{163744}\right) \chi^{-37/9} \right\}\,.
+\end{align}
+\end{subequations}
+\end{widetext}
+
+Additionally, we present the LALSuite-compatible form of $\psi_{j,n}$, where the reference phase ($\phi_{\rm ref}$), defined at a chosen reference frequency ($f_{\rm ref}$), is used instead of $\phi_c$. If we define the third term of Eq.~(\ref{eq:Ecck_psi_full_}), i.e. ``$\frac{3 j}{256 \eta  x_{j,n}^{5/2}} \sum _{u=0}^6 {\cal D}_u\,x_{j,n}^{u/2}$'' as $\Psi_{j,n}$ (a function of frequency, provided fixed parameters) and given that $\Psi_{j,n}$ is $\Psi_{j,n}^{\rm ref}$ at $f_{\rm ref}$, then the form of $\psi_{j,n}$ with a proper phase shift reads
+\begin{align}
+\label{e:lal_psi_jn}
+\psi_{j,n} =& \, -2 \pi  f t_c+\phi_{\rm ref} \left(j-(j+n)\frac{k}{1+k} \right) \notag \\
+&+ \Psi_{j,n}^{\rm ref} - \Psi_{j,n}\,.
+\end{align}
+
+\subsection{Explicit 3PN Order Expression for the Periastron Advance Parameter $k$}\label{sec: periastron k}
+
+Complete expression of advancement of periastron parameter $k$ is shown below and encompasses up-to 3PN terms and leading order in eccentricity ${\cal O}(e_0^2)$. $k$ expression reads
+\begin{subequations}
+\label{eq:k_full}
+\begin{align}
+k_j =& \, \sum_{u=0}^6 k_u \, x^{u/2}_j \,,
+\end{align}
+with
+\begin{align}
+x_j =& \, \left(\frac{2 \pi G m f}{j c^3}\right)^{2/3}\,. 
+\end{align}
+\end{subequations}
+
+The coefficients of the above expression are listed as follows
+
+\begin{widetext}
+\begin{subequations}
+\label{eq:k_coeff}
+\begin{align}
+k_{0} =& \, 0\,, \\
+k_{1} =& \, 0\,, \\
+k_{2} =& \, 3 + e_0^2 \left\{ \frac{3}{\chi^{19/9}} \right\}\,, \\
+k_{3} =& \, 0 \,,\\
+k_{4} =& \, \frac{27}{2} - 7\eta + e_0^2 \left\{ \left(\frac{2833}{336} - \frac{197\eta}{12}\right)\frac{1}{\chi^{25/9}} + \left(\frac{10523}{336} - \frac{49\eta}{12}\right)\frac{1}{\chi^{19/9}} \right\}\,, \\
+k_{5} =& \, e_0^2 \left\{ \frac{1}{\chi^{28/9}} + \frac{1}{\chi^{19/9}} \right\}\frac{377\pi}{24}\,, \\
+k_{6} =& \, \frac{1}{32}(2160 +( 123\pi^2 - 5192)\eta + 224\eta^2) + e_0^2 \left\{ \left(-\frac{1193251}{1016064} -\frac{66317\eta}{3024} +\frac{18155\eta^2}{432}\right)\frac{1}{\chi^{31/9}} \right. \notag \\ 
+& \left. + \left(\frac{29811659}{338688} -\frac{276481\eta}{1512} +\frac{9653\eta^2}{432}\right)\frac{1}{\chi^{25/9}} + \left(\frac{142961921}{508032} -\frac{1419653\eta }{3024} +\frac{1599 \pi^2\eta}{128} +\frac{91\eta^2}{27} \right)\frac{1}{\chi^{19/9}} \right\}\,.
+\end{align}
+\end{subequations}
+\end{widetext}
+
+\subsection{ Explicit expression for eccentricity evolution $e_t$}\label{sec: et evolution}
+
+Following Appendix C of~\cite{TGHH}, our 3PN accurate $e_t$ expression that accounts for the leading order ${\cal O}(e_0)$ contributions reads
+\begin{align}
+e_t =& \, \sum_{m=0}^{6} {\cal E}_m \, x_{j,n}^{m/2},\label{eq: et}
+\end{align}
+with 
+\begin{widetext}
+\begin{subequations}
+\begin{align}
+% 0
+{\cal E}_0=& \,e_0\, \chi^{-19/18}\,, \\
+% 1
+{\cal E}_1=& \,0\,, \\
+% 2
+{\cal E}_2=&\, e_0 \left\{\left(-\frac{2833}{2016}+\frac{197 \eta }{72}\right)\chi^{-19/18}+\left(\frac{2833}{2016}-\frac{197\eta}{72}\right)\chi^{-31/18}\right\}\,, \\
+% 3
+{\cal E}_3=& \, e_0\left\{\frac{377}{144}\pi\left(-\chi^{-19/18}+\chi ^{-37/18}\right)\right\}\,, \\
+% 4
+{\cal E}_4=& \,e_0 \left\{\left(\frac{77006005}{24385536}-\frac{1143767 \eta }{145152}+\frac{43807 \eta ^2}{10368}\right)\chi^{-19/18}+\left(-\frac{8025889}{4064256}+\frac{558101\eta }{72576}-\frac{38809 \eta^2}{5184}\right)\chi^{-31/18} \right. \notag \\ &\left. +\left(-\frac{28850671}{24385536}+\frac{27565 \eta }{145152}+\frac{33811 \eta^2}{10368}\right) \chi ^{-43/18}\right\}\,, \\
+% 5
+{\cal E}_5=& \, e_0 \left\{\left(\frac{9901567 \pi }{1451520}-\frac{202589 \pi  \eta }{362880}\right) \chi ^{-19/18}+\left(-\frac{1068041 \pi }{290304}+\frac{74269 \pi  \eta}{10368}\right) \chi ^{-31/18} \right. \notag \\ & \left. +\left(-\frac{1068041 \pi }{290304}+\frac{74269 \pi  \eta }{10368}\right) \chi ^{-37/18} +\left(\frac{778843 \pi}{1451520}-\frac{4996241 \pi  \eta }{362880}\right) \chi ^{-49/18}\right\}\,, \\
+% 6
+{\cal E}_6=& \, \left\{\left(-\frac{33320661414619}{386266890240}+\frac{180721 \pi^2}{41472}+\frac{3317 \gamma }{252}+\left(\frac{161339510737}{8778792960}+\frac{3977 \pi ^2}{2304}\right) \eta -\frac{359037739 \eta^2}{20901888} +\frac{10647791 \eta ^3}{2239488} \right. \right. \notag \\ 
+&\left. +\frac{12091 \log (2)}{3780}+\frac{26001 \log (3)}{1120}+\frac{3317 \log (x)}{504}\right)\chi ^{-19/18}+\left(\frac{218158012165}{49161240576}-\frac{34611934451 \eta }{1755758592}+\frac{191583143 \eta ^2}{6967296} \right. \notag \\ 
+&\left. -\frac{8629979 \eta ^3}{746496}\right) \chi^{-31/18}-\frac{142129 \pi ^2}{20736}\chi ^{-37/18} +\left(\frac{81733950943}{49161240576}-\frac{6152132057 \eta }{1755758592}-\frac{1348031 \eta^2}{331776} \right. \notag \\ 
+&\left. +\frac{6660767 \eta ^3}{746496}\right) \chi ^{-43/18}+\left(\frac{216750571931393}{2703868231680}+\frac{103537 \pi ^2}{41472}-\frac{3317 \gamma }{252} +\left(\frac{866955547}{179159040}-\frac{3977 \pi^2}{2304}\right) \eta \right.\notag \\ 
+&\left.\left. -\frac{130785737 \eta ^2}{20901888}-\frac{4740155 \eta ^3}{2239488}-\frac{12091 \log (2)}{3780}-\frac{26001 \log(3)}{1120} -\frac{3317 \log (x)}{504}-\frac{3317 \log (\chi )}{756}\right)\chi ^{-55/18}\right\}e_0 \,.
+\end{align}
+\end{subequations}
+\end{widetext}
+
+\renewcommand{\theequation}{B\arabic{equation}} % Redefine equation numbering
+% \setcounter{equation}{0}
+\section{Detailed Analytical Structure of the \texttt{TaylorF2Ecch} Waveform Approximant} \label{sec: TaylorF2Ecch_full}
+
+In the following subsections, we present the complete analytical structure of the \texttt{TaylorF2Ecch} waveform approximant. This includes explicit expressions for the frequency-domain waveform $\tilde{h}(f)$ and the associated Fourier phase $\psi_j$.
+
+\subsection{The 3PN Accurate Analytical Expression for the Frequency-Domain Waveform $\tilde{h}(f)$} \label{sec: TaylorF2Ecch hf}
+
+Below, we present the explicit of $\tilde{h}(f)$ with it's 3PN accurate $\psi_{j}$ with eccentricity correction of ${\cal O}(e_0^2)$ order, and quadrupolar amplitude with eccentricity correction of ${\cal O}(e_0)$ order. The expression reads
+\begin{align}
+\tilde{h}(f) = & \, \left( \frac{5\pi \eta}{384} \right)^{1/2} \frac{(G m)^2}{c^5 {\cal D}} \left(\frac{Gm\pi f}{c^3}\right)^{-7/6} \notag \\
+&\times \sum_{j} \xi_{j} \left(\frac{j}{2}\right)^{2/3} e^{-i(\Psi_{j}-\pi/4)} \Theta_{j}\,,
+\end{align}
+where $\Theta_{j} = \text{Heaviside}\left[  j f_{\text{LSO}}-2f \right]$.
+
+\subsection{Explicit 3PN Order Expression for the Fourier Phase $\psi_{j}$} \label{sec: TaylorF2Ecch_psi}
+
+The analytical form of 3PN-order Fourier phase $\psi_{j}$, for each $j$-th harmonic, that includes ${\cal O}(e_0^2)$ contributions is given by
+\label{eq:Ecch_psi_full}
+\begin{align}
+\psi_{j} =& \, -2 \pi  f t_c+\phi _c j - \frac{3 j}{256 \eta  x_{j}^{5/2}} \sum _{u=0}^6 {\cal D}_u x_j^{u/2}\,,
+\end{align}
+where $x_{j} = \left( \frac{2 \pi G m f}{jc^3} \right)^{2/3}$. The PN coefficients ${\cal D}_u$ in the above expression read
+\begin{widetext}
+\begin{subequations}
+\begin{align}
+% 0
+{\cal D}_0=& \, 1- e_0^2 \left\{ \frac{2355}{1462} \chi^{-19/9}\right\}\,, \\
+% 1
+{\cal D}_1=& \, 0\,, \\
+% 2
+{\cal D}_2=& \, \frac{3715}{756} + \frac{55 \eta}{9} + e_0^2 \left\{ \left( -\frac{2223905}{491232} + \frac{154645 \eta}{17544} \right) \chi^{-25/9} + \left( -\frac{2045665}{348096} - \frac{128365 \eta}{12432} \right) \chi^{-19/9} \right\} \,, \\ 
+% 3
+{\cal D}_3=& \, -16 \pi + e_0^2 \left\{ -\frac{295945 \pi}{35088} \chi^{-28/9} + \frac{65561 \pi}{4080} \chi^{-19/9} \right\} \,, \\
+% 4
+{\cal D}_4=& \, \frac{15293365}{508032} + \frac{27145 \eta}{504} + \frac{3085 \eta^2}{72} \notag \\
+&+ e_0^2 \left\{ \left( \frac{936702035}{1485485568} + \frac{3062285 \eta}{260064} - \frac{14251675 \eta^2}{631584} \right) \chi^{-31/9} + \left( -\frac{5795368945}{350880768} + \frac{4917245 \eta}{1566432} + \frac{25287905 \eta^2}{447552} \right) \chi^{-25/9} \right. \notag \\
+&\left. + \left( -\frac{111064865}{14141952} - \frac{165068815 \eta}{4124736} - \frac{10688155 \eta^2}{294624} \right) \chi^{-19/9} \right\} \,,  \\
+% 5
+{\cal D}_5=& \, \left( \frac{38645}{756} - \frac{65 \eta}{9} \right) \pi \left( 1 + \log\left(x^{3/2}\right) \right) + e_0^2 \left\{ \left( -\frac{7063901 \pi}{520128} + \frac{149064749 \pi \eta}{2210544} \right) \chi^{-34/9} \right. \notag \\
+& + \left( -\frac{771215705 \pi}{25062912} - \frac{48393605 \pi \eta}{895104} \right) \chi^{-28/9} + \left( \frac{185734313 \pi}{4112640} - \frac{12915517 \pi \eta}{146880} \right) \chi^{-25/9} \notag \\
+&\left. + \left( \frac{3873451 \pi}{100548} + \frac{15803101 \pi \eta}{229824} \right) \chi^{-19/9} \right\} \,,\\
+% 6
+{\cal D}_6=& \, \frac{11583231236531}{4694215680} - \frac{640 \pi^2}{3} - \frac{6848 \gamma}{21} + \left( -\frac{15737765635}{3048192} + \frac{2255 \pi^2}{12} \right) \eta + \frac{76055 \eta^2}{1728} - \frac{127825 \eta^3}{1296} - \frac{13696 \log(2)}{21} \notag \\
+& - \frac{3424 \log(x)}{21} + e_0^2 \left\{ \left( \frac{2440991806915}{1061063442432} + \frac{1781120054275 \eta}{37895122944} - \frac{1029307085 \eta^2}{150377472} - \frac{2330466575 \eta^3}{16111872} \right) \chi^{-31/9} \right. \notag \\
+& + \frac{24716497 \pi^2}{293760} \chi^{-28/9} + \left( -\frac{314646762545}{14255087616} - \frac{1733730575525 \eta}{24946403328} + \frac{11585856665 \eta^2}{98993664} + \frac{2105566535 \eta^3}{10606464} \right) \chi^{-25/9} \notag \\
+& + \left( \frac{59648637301056877}{112661176320000} - \frac{21508213 \pi^2}{276480} - \frac{734341 \gamma}{16800} + \left( -\frac{409265200567}{585252864} + \frac{103115 \pi^2}{6144} \right) \eta - \frac{4726688461 \eta^2}{34836480} \right. \notag \\
+& \left. - \frac{69237581 \eta^3}{746496} - \frac{9663919 \log(2)}{50400} + \frac{4602177 \log(3)}{44800} - \frac{734341 \log(x)}{33600} \right) \chi^{-19/9} \notag \\
+& + \left( -\frac{4165508390854487}{16471063977984} - \frac{96423905 \pi^2}{5052672} + \frac{2603845 \gamma}{61404} + \left( -\frac{1437364085977}{53477480448} + \frac{3121945 \pi^2}{561408} \right) \eta + \frac{4499991305 \eta^2}{636636672} \right. \notag \\
+& \left. \left. + \frac{2425890995 \eta^3}{68211072} + \frac{1898287 \log(2)}{184212} + \frac{12246471 \log(3)}{163744} + \frac{2603845 \log(x)}{122808} - \frac{2603845 \log(\chi)}{184212} \right) \chi^{-37/9} \right\}\,.
+\end{align}
+\end{subequations}
+\end{widetext}
+
+Similar to Eq.~(\ref{e:lal_psi_jn}), LALSuite-compatible form $\psi_j$ can be written as follows
+\begin{align}
+\label{e:lal_psi_j}
+\psi_{j} =& \, -2 \pi  f t_c+\phi_{\rm ref}j + \Psi_{j}^{\rm ref} - \Psi_{j}\,.
+\end{align}
+
+\section{Match-test in the Parameter Space of Eccentricity and Mass}\label{sec:match_test_appendix}
+
+This appendix section offers an extended analysis of the mismatch percentage, ${\cal M}^*_{\%}$, complementing comparisons in Fig.~\ref{fig:contour_mismatch} of the main text. Fig.~\ref{fig:contour_mismatch_all} details these comparisons, illustrating ${\cal M}^*_{\%}$ variations with m, $e_0$ (at 20~Hz), and $\eta$ when comparing our \texttt{TaylorF2Ecck} approximant against \texttt{TaylorF2Ecc}, \texttt{TaylorF2Ecch}, and the circular \texttt{TaylorF2}. White dashed lines in the figure panels denote GW170817-like parameters. Notably, \texttt{TaylorF2Ecck} deviates more from \texttt{TaylorF2} at higher $e_0$ and lower $m$ (fixed $\eta$), showing a positive correlation, and also at higher $e_0$ and lower $\eta$ (fixed m), exhibiting a negative correlation. This deviation with $m$ is more pronounced than with $\eta$. Similar behavior is anticipated when \texttt{TaylorF2Ecch} and \texttt{TaylorF2Ecc} are compared with \texttt{TaylorF2} due to their similarity in leading order eccentric correction in the dominant mode. Furthermore, \texttt{TaylorF2Ecck} increasingly deviates from \texttt{TaylorF2Ecch} with rising $e_0$ and m (fixed $\eta$), accompanied by a negative correlation. 
+A similar, though more subtle, negative correlation is seen with increasing $e_0$ and $\eta$ (fixed m); the change in ${\cal M}^*_{\%}$ with $\eta$ in this comparison is less significant than with m, especially at lower $e_0$ values. The observed trends in the change of ${\cal M}^*_{\%}$ when comparing \texttt{TaylorF2Ecck} with \texttt{TaylorF2Ecch} are broadly similar to those seen in the \texttt{TaylorF2Ecck} versus \texttt{TaylorF2Ecc} comparison. This similarity can be attributed to the inclusion of the periastron advance effect in \texttt{TaylorF2Ecck}, which introduces extra harmonics and additional phase shifts in the sub-dominant harmonics compared to models that omit it.
+
+\begin{figure*}[ht!]
+    \centering
+    \hspace*{-0.03\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=20cm]
+    {figs/mismatchvalues_EcckVsTF2_fixed_q.pdf}\label{fig:e0_m_tf2}
+    \hspace*{-0.03\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=20cm]{figs/mismatchvalues_EcckVsEcc_fixed_q.pdf}\label{e0_m_ecc}
+    \hspace*{-0.03\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=20cm]{figs/mismatchvalues_EcckVsEcch_fixed_q.pdf}\label{e0_m_ecch}
+    \hspace*{-0.03\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=20cm]{figs/mismatchvalues_EcckVsTF2_fixed_mtot.pdf}\label{e0_eta_tf2}
+    \hspace*{-0.03\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=20cm]{figs/mismatchvalues_EcckVsEcc_fixed_mtot.pdf}\label{e0_eta_ecc}
+    \hspace*{-0.03\textwidth}%
+    \vspace{-0.035\textwidth}%
+    \includegraphics[width=20cm]{figs/mismatchvalues_EcckVsEcch_fixed_mtot.pdf}\label{e0_eta_ecch}
+    \vspace{0.0\textwidth}%
+    \caption{%context
+    This figure provides an extended analysis of waveform similarity, complementing Fig.~\ref{fig:contour_mismatch}, by comparing \texttt{TaylorF2Ecck} against \texttt{TaylorF2Ecc}, \texttt{TaylorF2Ecch}, and the circular \texttt{TaylorF2} model across a parameter space relevant for NS-NS systems, with GW170817-like parameters highlighted by white dashed lines.
+    %content
+    The panels show ${\cal M}^*_\%$ as a function of $m$ versus $e_0$ (at 20~Hz) with $\eta$ (top three rows of panels), and as a function of $\eta$ versus $e_0$ with fixed $m$ (bottom three rows of panels). Deviations between \texttt{TaylorF2Ecck} and \texttt{TaylorF2} increase with higher $e_0$ and lower $m$ (positive correlation) or lower $\eta$ (negative correlation), with the impact of $m$ being more pronounced. When comparing \texttt{TaylorF2Ecck} with \texttt{TaylorF2Ecc} and \texttt{TaylorF2Ecch}, similar dependencies on $m$, $e_0$, and $\eta$ are observed, characterized by negative correlations in the $e_0$--$m$ and $e_0$--$\eta$ planes; the variation of ${\cal M}^*_\%$ with $m$ is more significant than with $\eta$.
+    %conclusion
+    The plots demonstrate how ${\cal M}^*_\%$, and thus the distinguishability of \texttt{TaylorF2Ecck}, varies with binary parameters $m$, $\eta$, and $e_0$ when compared to the other eccentric models. The trends observed when comparing \texttt{TaylorF2Ecck} with \texttt{TaylorF2Ecch} are broadly similar to those from the \texttt{TaylorF2Ecck} versus \texttt{TaylorF2Ecc} comparison, which can be attributed to the periastron advance effects (extra harmonics and phase shifts in sub-dominant modes) included in \texttt{TaylorF2Ecck}.
+    }
+    \label{fig:contour_mismatch_all}
+\end{figure*}
+
+\section{Parameter Estimation Results from Injection-Recovery Tests}\label{sec:appendix_injection_recovery}
+
+This appendix section presents supplementary results from injection-recovery tests, elaborating on the analysis in Section~\ref{sec:sanity_check}.
+
+\subsection{GW170817-like Injections}
+
+Fig.~\ref{fig:injection_recovery_appendix_GW170817} shows two injection-recovery tests comparing \texttt{TaylorF2Ecck}, \texttt{TaylorF2Ecc}, and \texttt{TaylorF2}. It shows that \texttt{TaylorF2} fails to recover the injected mass parameters at $e_0=0.01$. Additionally, the plot illustrates how the constraints on the mass parameters and the correlation between them vary with changing $e_0$, using \texttt{TaylorF2Ecck} and \texttt{TaylorF2Ecc} waveforms.
+
+\begin{figure*}[ht!]
+    \centering
+    \hspace*{0.00\textwidth}%
+    \subfloat[Injection-recovery with $e_0=0.01$]{\includegraphics[width=0.505\textwidth]{figs/injection_recovery_Ecck_vs_Ecc_e0_0p01_GW170817.pdf} \label{fig:injection_recovery1}}
+    \hspace*{0.00\textwidth}%
+    \subfloat[Injection-recovery with $e_0=0.1$]{\includegraphics[width=0.505\textwidth]{figs/injection_recovery_Ecck_vs_Ecc_e0_0p10_GW170817.pdf}\label{fig:injection_recovery2}}
+    \caption{
+    Corner plots illustrating the posterior distributions of $m$, $\eta$, and $e_0$ from injection-recovery tests using GW170817-like parameters with non-spinning assumptions. These tests evaluate the performance of three waveform approximants: \texttt{TaylorF2Ecck} (Ecck 3PN), \texttt{TaylorF2Ecc} (Ecc 3PN), and \texttt{TaylorF2} (TF2 3PN, left panel only) in recovering signals injected with \texttt{TaylorF2Ecck} at two initial eccentricity values, $e_0 = 0.01$ (panel a) and $e_0 = 0.1$ (panel b), both at 20 Hz.
+    In each panel, the vertical solid black lines indicate the injected values, while the vertical dotted lines show the median and 90\% credible intervals for each model: Ecck (blue), Ecc (orange), and TF2 (red). The 2D contours represent 39.3\% and 86.4\% credible regions.
+    At $e_0 = 0.01$, Ecck and Ecc both successfully recover the injected mass parameters, while TF2 fails to do so within the 90\% interval. At $e_0 = 0.1$, Ecck not only provides tighter parameter constraints but also displays an altered correlation structure between mass and eccentricity, highlighting the increasing importance of including eccentricity and periastron advance at higher $e_0$. See Sec.~\ref{sec:sanity_check} for additional discussion.
+    }
+    % \caption{
+    % Figure shows corner plots for $m$, $q$ and $e_0$ posteriors from injection-recovery tests at two injected $e_0$ values: 0.01 ((a): left panel) and 0.1 ((b): right panel) for the GW170817-like events with no spin. \texttt{TaylorF2Ecck} is injected and recovered, and compared using \texttt{TaylorF2Ecck} (Ecck) vs. \texttt{TaylorF2Ecc} (Ecc) vs. \texttt{TaylorF2} (TF2, left panel only). 
+    % Vertical dotted lines indicate the median and 90\% credible interval for Ecck (blue), Ecc (orange), and TF2 (red).
+    % Vertical solid black line indicate the injected values.
+    % Plot (b) shows that Ecck not only better constrain the injected parameters (at $e_0=0.1$), but also exhibits a change in the correlation between the mass and eccentricity parameters when the injected value of $e_0$ is increased (from plot (a) to plot (b)). 
+    % Additionally, plot (a) shows that TF2 failed to recover the injected parameters of $m$ and $\eta$ within the 90\% credible interval at $e_0=0.01$, while Ecck and Ecc are able to recover it. 
+    % For other details see Sec.~\ref{sec:sanity_check}.
+    % }
+\label{fig:injection_recovery_appendix_GW170817}
+\end{figure*}
+
+\subsection{GW190425-like Injections}
+
+Fig.~\ref{fig:injection_recovery_appendix_GW190425} shows results from injection-recovery tests with a GW190425-like event and varying $e_0$ values. It compares \texttt{TaylorF2Ecck} with \texttt{TaylorF2} and illustrates the $e_0$ parameter region where \texttt{TaylorF2Ecck} becomes distinguishable from \texttt{TaylorF2}, and a value of $e_0$ where \texttt{TaylorF2} fails to recover the injected mass parameters.
+
+\begin{figure*}[ht!]
+    \centering
+    \hspace*{0.00\textwidth}%
+    \subfloat[$\Delta$log$_{10}{\rm BF}$ Vs $e_0$ plot for GW190425-like event]{\includegraphics[width=0.45\textwidth]{figs/bf_vs_eccn_tf2_GW190425.pdf}
+    \label{fig:injection_recovery1_GW190425}}
+    \hspace*{0.00\textwidth}%
+    \subfloat[Injection-recovery result plot (with $e_0=0.02$) for GW190425-like event]{\includegraphics[width=0.45\textwidth]{figs/injection_recovery_Ecck_vs_TF2_e0_0p05_GW190425.pdf}\label{fig:injection_recovery2_GW190425}}
+    \caption{
+    Injection-recovery analysis for events, with  GW190425-like parameters, using eccentric waveform models. The aim is to assess the waveform distinguishability between \texttt{TaylorF2Ecck} (Ecck, 3PN-accurate, non-spinning) and the quasi-circular \texttt{TaylorF2} (TF2, 3PN-accurate, non-spinning) across a range of initial eccentricities $e_0$.
+    Panel (a) shows $\Delta \log_{10}{\rm BF}$ as a function of $e_0$, illustrating when the inclusion of eccentricity becomes statistically significant. Horizontal dashed lines mark conventional interpretative thresholds: $\Delta \log_{10}{\rm BF} = 1$ (strong), $2$ (decisive), and $8$ (Jeffreys’ criterion for strong evidence). Vertical lines correspond to eccentricity values ($e_0 = 0.018$ and $e_0 = 0.028$) beyond which \texttt{TaylorF2Ecck} becomes distinguishable from TF2 under different criteria.
+    Panel (b) presents the posterior distributions of chirp mass ${\cal M}$ and mass ratio $q$ for an injected signal with $e_0 = 0.02$ using \texttt{TaylorF2Ecck}. The model recoveries from Ecck (blue) and TF2 (red) are shown with median values and 90\% credible intervals as vertical dashed lines; the injected values are indicated by solid black lines. The plot demonstrates that TF2 fails to recover the injected mass parameters within the 90\% interval, even at this low $e_0$, while Ecck succeeds. This highlights the importance of accounting for eccentricity in waveform models when analyzing such systems.
+    }
+    % \caption{Plot (a) shows $\Delta$log$_{10}{\rm BF}$ with varying $e_0$ values from injection-recovery tests for GW190425-like event. It compares TaylorF2Ecck (Ecck) and TaylorF2 (3PN-accurate, no-spin) (TF2) in the context waveform distinguishability with $\Delta$log$_{10}{\rm BF}=1,2$ indicating strong and decisive respectively. We also include the horizontal dotted line at $\Delta$log$_{10}{\rm BF}=8$ representing Jeffreys' criteria of strong distinguishability. Vertical dotted-lines indicates values beyond which eccentricity become significant ($e_0>0.018$, $e_0>0.028$) for parameter estimation of GW190425-like events for differing criteria. Plot (b) displays corner plot for ${\cal M}$ and $q$ posteriors from injetion-recovery test with GW190425-like event (with no spin) for Ecck and TF2 waveforms, with injected $e_0=0.02$. Vertical dotted blue (green) lines shows median and 90\% credible interval of Ecck (TF2), while black vertical lines indicate the injected values. This plot shows TF2 is unable to recover the injected parameters of ${\cal M}$ and $q$ within the 90\% credible interval at $e_0=0.02$.
+    % }
+\label{fig:injection_recovery_appendix_GW190425}
+\end{figure*}
+
+% \caption{Plot (a) shows (\Delta\log_{10}{\rm BF}) values from injection-recovery tests for a GW190425-like event, comparing \texttt{TaylorF2Ecck} (Ecck) and \texttt{TaylorF2} (3PN-accurate, non-spinning) (TF2). A (\Delta\log_{10}{\rm BF}) value of 2 indicates decisive waveform distinguishability. The vertical dotted line indicates the (e_0) value (0.016) beyond which eccentricity becomes significant for parameter estimation of GW190425-like events. Plot (b) displays corner plots for ({\cal M}) and (q) posteriors from injection-recovery tests with a GW190425-like event (non-spinning) for Ecck and TF2 waveforms, with injected (e_0 = 0.05). Vertical dotted lines show the median and 90% credible interval for Ecck (blue) and TF2 (green), while black vertical lines indicate the injected values. This plot shows that TF2 fails to recover the injected ({\cal M}) and (q) parameters within the 90% credible interval at (e_0 = 0.05).}
+
+\section{Parameter Estimation Results of Pure Inspiral Events}
+
+We present extended posterior distributions for the binary neutron star events GW170817 and GW190425 using multiple waveform models to complement descriptions and plots in the main text.
+
+\subsection{Parameter estimation result for GW170817}\label{sec:full_gw170817}
+
+Fig.~\ref{fig:pe_context} contextualizes \texttt{TaylorF2ecck}'s parameter estimation behavior against full-\texttt{TaylorF2ecc} (which includes leading-order spin and 3.5PN phase circular contributions) and LVK's \texttt{IMRPhenomPv2NRT (low-spin)}. 
+We include two \texttt{TaylorF2ecc}related results: one derived from our parameter estimation and another from the prior work given in the Ref.~\cite{LNB}, which we will refer to as LNB. LNB's results in Fig.~\ref{fig:pe_context}, directly sourced from their data~\cite{LNBrepo}, should not be confused with the 10 Hz-associated findings presented in their paper. Notably, their work employs Markov Chain Monte Carlo (MCMC) parameter estimation with $f_{\rm min}$ of 20 Hz and inspiral duration of 190 seconds, which differs from ours (see Sec.~\ref{sec:analysis_techniques}). 
+
+\begin{figure*}[ht!]
+    \centering
+    \includegraphics[width=9cm]{figs/GW170817b.pdf}
+    \caption{%context 
+    Corner plots showing the posterior distributions for ${\cal M}$, $q$, and $e_0$ from parameter estimation of GW170817. The 2D contours represent the $1\sigma$ and $2\sigma$ credible intervals, enclosing 39.3\% and 86.4\% of the posterior samples.
+    %content
+    This comparison includes results from our 3PN-accurate \texttt{TaylorF2ecck} approximant (Ecck 3PN) against those arising from the standard full-\texttt{TaylorF2ecc} approximant that incorporates the leading order spin effects and 3.5PN contributions for circular orbits in its Fourier phase from i) our parameter estimation results (Ecc 3.5PN+Spin) and ii) Lenon et al. 2020~\cite{LNB} (Ecc 3.5PN+Spin LNB) with differing parameter estimation settings, and iii) the fully circular \texttt{IMRPhenomPv2NRT} family (Pv2NRT), employed by the LVK consortium.
+    %conclusion
+    The Ecck model provides tighter constraints on $q$ than the spin-corrected models, though this must be interpreted cautiously as Ecck lacks spin effects and higher-order (3.5PN) phasing corrections. The Ecc model in our analysis yields tighter posteriors compared to LNB, likely due to differences in sampling techniques (Nested Sampling vs. MCMC) and the inclusion of longer-duration data. The Pv2NRT model is included for broader context and comparison.
+    }
+    \label{fig:pe_gw170817_compare}
+\end{figure*}
+
+In Fig.~\ref{fig:GW170817_full_pe}, we present the parameter estimation results for GW170817. These results include the posterior distributions of the following parameters: (${\cal M}$, $q$, $m$, $eta$, $e_0$, $D_L$ and $\theta_{jn}$), and also show the correlations for each parameter pair. The plot compares \texttt{TaylorF2Ecck}, \texttt{TaylorF2Ecc}, and \texttt{TaylorF2Ecc} (the 3.5PN-accurate version), abbreviated as `Ecck 3PN', `Ecc 3PN', and `Ecc 3.5PN', respectively. The Ecck 3PN and Ecc 3PN models produce nearly identical posteriors, with only subtle differences in the joint distributions involving $e_0$ (e.g., ${\cal M}$–$e_0$, $q$–$e_0$), attributed to periastron advance and higher harmonics in Ecck. A significant bias in the $q$ posterior is observed when comparing Ecck 3PN to Ecc 3.5PN, reflecting the influence of higher-order circular corrections, though these corrections have negligible impact on the $e_0$ constraint. No significant differences are found in $D_L$ or $\theta_{jn}$ posteriors, and neither correlates substantially with $e_0$.
+
+\begin{figure*}[ht!]
+    \centering
+    \includegraphics[width=18cm]{figs/fullpe_gw170817.pdf}
+    \caption{
+    Figure shows extended corner plots of the posterior results from the GW170817 parameter estimation, complementary to Fig.~\ref{fig:pe_gw170817}. The 2D contour plots indicate the $1\sigma$ and $2\sigma$ confidence regions, corresponding to 39.3\% and 86.4\% of the posterior samples, respectively. Vertical dashed lines mark the median and 90\% credible intervals of the \texttt{TaylorF2Ecck} posteriors. Three waveform models are compared: Ecck (3PN), \texttt{TaylorF2Ecc} (Ecc 3PN), and \texttt{TaylorF2Ecc} with additional 3.5PN circular corrections (Ecc 3.5PN).
+    The comparison focuses on key binary parameters: $\mathcal{M}$, $q$, $m$, $\eta$, $e_0$, $D_L$, and $\theta_{jn}$. Given the observed negligible eccentricity (i.e., $e_0 \lesssim 0.011$), the Ecck 3PN and Ecc 3PN models yield very similar posterior distributions for most parameters, with only subtle differences observed in the mass and eccentricity joint posteriors (e.g., ${\cal M}$--$e_0$ and $q$--$e_0$ planes), due to the inclusion of periastron advance and additional harmonics in Ecck 3PN. However, a significant bias is seen in the $q$ posterior when comparing Ecck 3PN to Ecc 3.5PN, underscoring the impact of higher-order circular phasing terms. Notably, these 3.5PN circular corrections in Ecc 3.5PN do not affect its $e_0$ constraint, as the eccentricity implementation in this approximant is limited to 3PN order. The posteriors for $D_L$ and $\theta_{jn}$ show no significant differences across the models and exhibit no substantial correlation with $e_0$.
+    }
+    \label{fig:GW170817_full_pe}
+\end{figure*}
+
+\subsection{Parameter estimation result for GW190425}\label{sec:full_GW190425}
+
+Fig.~\ref{fig:GW190425_full_pe} shows extended posterior distributions for GW190425 using the same waveform models and parameter set as in the GW170817 analysis. This analysis reinforces the conclusions drawn from GW170817, albeit with greater uncertainty due to GW190425's lower SNR and absence of an electromagnetic counterpart.
+
+The inclusion of 3.5PN circular phasing in the Ecc model induces a shift in the $q$ posterior, though this shift is less pronounced than in GW170817. Similar to GW170817, the $e_0$ constraint remains unaffected by the 3.5PN phasing. Subtle differences are again observed in the joint posteriors involving mass and eccentricity (e.g., ${\cal M}$–$e_0$, $q$–$e_0$). The $D_L$ and $\theta_{jn}$ posteriors remain consistent across all waveform models and show no substantial correlation with $e_0$.
+
+\begin{figure*}[ht!]
+    \centering
+    \includegraphics[width=18cm]{figs/fullpe_gw190425.pdf}
+    \caption{
+    Figure displays extended corner plots of the posterior results from the GW190425 parameter estimation analysis with $f_{\rm min}$ set at 20\,Hz. 
+    The 2D contour plots indicate the $1\sigma$ and $2\sigma$ confidence regions, corresponding to 39.3\% and 86.4\% of the posterior samples, respectively. Vertical dashed lines mark the median and 90\% credible intervals of the \texttt{TaylorF2Ecck} posteriors. Three waveform models are compared: Ecck (3PN), \texttt{TaylorF2Ecc} (Ecc 3PN), and \texttt{TaylorF2Ecc} with additional 3.5PN circular corrections (Ecc 3.5PN). The parameters analyzed include ${\cal M}$, $q$, $m$, $\eta$, $e_0$, $D_L$, and $\theta_{jn}$. 
+    GW190425 reinforces the conclusions drawn from GW170817, although with greater uncertainty due to its lower signal-to-noise ratio and the absence of an electromagnetic counterpart. This results in weaker constraints on both the mass ratio $q$ and the eccentricity $e_0$, with $e_0$ remaining consistent with zero (i.e., $e_0 \lesssim 0.028$). While the inclusion of 3.5PN circular phasing in \texttt{TaylorF2Ecc} still induces a shift in the mass ratio posterior, the effect is less pronounced than for GW170817. Similar to GW170817, subtle differences are observed in the joint posteriors involving mass and eccentricity (e.g., ${\cal M}$--$e_0$ and $q$--$e_0$ planes). 
+    The inclusion of 3.5PN phasing in \texttt{TaylorF2Ecc} has a negligible impact on the $e_0$ constraint. Furthermore, the posteriors for $D_L$ and $\theta_{jn}$ show no significant differences across waveform models and exhibit no substantial correlation with $e_0$.
+    }
+    \label{fig:GW190425_full_pe}
+\end{figure*}
+
+\section{Comparison of \texttt{pyEFPE}, \texttt{TaylorF2Ecck}, and \texttt{TaylorF2Ecc} Waveform Approximants}
+\label{sec:comparison_pyefpe_taylorf2_family}
+
+Figure~\ref{fig:mismatch_pyEFPE_fmax} presents a comparative analysis of the \texttt{pyEFPE} waveform model against members of the \texttt{TaylorF2} family of eccentric waveforms. Specifically, the mismatch percentage, ${\cal M}^*_{\%}$, is shown as a function of initial eccentricity $e_0$ for comparisons between \texttt{pyEFPE} and \texttt{TaylorF2Ecck} (at 3PN accuracy), as well as \texttt{TaylorF2Ecc} (at both 3PN and 3.5PN accuracy). The comparison is restricted to the inspiral regime by imposing upper frequency cutoffs of $f_{\rm max} = 512$~Hz and $1024$~Hz, well below the last stable orbit frequency $f_{\rm LSO} \sim 1575$~Hz. This enables a meaningful inspiral-limited waveform comparison across different frequency ranges. Note that in other mismatch tests discussed in Sec.~\ref{sec:sanity_check}, we used $f_{\rm max} = f_{\rm LSO}$.
+
+A key observation from Figure~\ref{fig:mismatch_pyEFPE_fmax} is that the mismatch ${\cal M}^*_{\%}$ between \texttt{pyEFPE} and the \texttt{TaylorF2} family waveforms does not approach zero even as $e_0 \to 0$, indicating fundamental differences between the models even in the quasi-circular limit. The mismatch also increases with higher $f_{\text{max}}$, reflecting larger accumulated phase differences over extended inspiral durations. When comparing \texttt{pyEFPE} with \texttt{TaylorF2Ecc}, the mismatch is higher for the 3.5PN-accurate version than for the 3PN version, suggesting that including higher-order PN terms in \texttt{TaylorF2Ecc} increases its divergence from \texttt{pyEFPE}. In the comparison with \texttt{TaylorF2Ecck}, ${\cal M}^*_{\%}$ increases monotonically with $e_0$, crossing the ${\cal M}^*_{\%} = 3\%$ threshold at $e_0 \gtrsim 0.08$, implying significant mismatch of \texttt{pyEFPE} to \texttt{TaylorF2Ecck} for moderate eccentricities.
+
+\begin{figure*}[ht!]
+    \centering
+    \hspace*{0.00\textwidth}%
+    \subfloat[$f_{\rm max} = 512$~Hz]{\includegraphics[width=0.4\textwidth]{figs/mismatch_pyEFPE_fmax_512Hz.pdf} \label{fig:mismatch_pyEFPE_fmax_512Hz}}
+    \hspace*{0.08\textwidth}%
+    \subfloat[$f_{\rm max} = 1024$~Hz]{\includegraphics[width=0.4\textwidth]{figs/mismatch_pyEFPE_fmax_1024Hz.pdf}\label{fig:mismatch_pyEFPE_fmax_1024Hz}}
+    \caption{
+    Mismatch comparison between \texttt{pyEFPE} and TaylorF2-family eccentric waveform approximants: \texttt{TaylorF2Ecck} (3PN), \texttt{TaylorF2Ecc} (3PN), and \texttt{TaylorF2Ecc} (3.5PN). The mismatch ${\cal M}^*_\%$ is plotted as a function of $e_0$ using a GW170817-like (non-spinning) binary and inspiral-only comparison for two different frequency cutoffs: (a) $f_{\rm max} = 512$~Hz and (b) $f_{\rm max} = 1024$~Hz. Across all cases, \texttt{pyEFPE} shows non-negligible mismatch with the TaylorF2 approximants, with ${\cal M}^*_\%$ increasing at higher $e_0$ and $f_{\rm max}$. Notably, mismatch with \texttt{TaylorF2Ecck} exceeds 3\% for $e_0 \gtrsim 0.08$, pointing to significant structural differences, possibly due to non-analytic eccentricity treatment and harmonic content in \texttt{pyEFPE}.
+    }
+\label{fig:mismatch_pyEFPE_fmax}
+\end{figure*}
+
+\bibliographystyle{apsrev4-2}
+\bibliography{bibliography}
+
+\end{document}  
