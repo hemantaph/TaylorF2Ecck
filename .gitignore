@@ -9,8 +9,6 @@ __pycache__/
 
 # Large scientific data / generated analysis artifacts
 *.gwf
-*.hdf
-*.hdf5
 *.dat
 *PSD.txt
 *.npy
